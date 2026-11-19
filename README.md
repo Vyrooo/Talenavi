@@ -201,8 +201,8 @@ DB_PASSWORD=
 SANCTUM_EXPIRATION=1440
 
 ADMIN_NAME="Store Administrator"
-ADMIN_EMAIL="admin@talenavi.test"
-ADMIN_PASSWORD=AdminSecure123!
+ADMIN_EMAIL="admin@gmail.com"
+ADMIN_PASSWORD=admin123
 ```
 
 ### Langkah 6: Buat Database MySQL
@@ -306,7 +306,7 @@ Autentikasi API menggunakan **Laravel Sanctum** dengan metode **Bearer Token**.
 | Role | Email | Password | Hak Akses |
 |---|---|---|---|
 | **Customer** | `test@gmail.com` | `123` | Akses katalog, keranjang belanja, dan checkout pesanan sendiri. |
-| **Administrator** | `admin@talenavi.test` | `AdminSecure123!` | Akses seluruh fitur customer + panel Admin Products CRUD. |
+| **Administrator** | `admin@gmail.com` | `admin123` | Akses seluruh fitur customer + panel Admin Products CRUD. |
 
 ---
 
