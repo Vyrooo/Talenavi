@@ -36,6 +36,7 @@ class CartService
                 'price' => number_format($priceFloat, 2, '.', ''),
                 'quantity' => $item->quantity,
                 'subtotal' => number_format($subtotalCents / 100, 2, '.', ''),
+                'is_active' => (bool) $product->is_active,
             ];
         }
 
@@ -53,6 +54,17 @@ class CartService
     public function addToCart(User $user, int $productId, int $quantity): CartItem
     {
         $product = Product::findOrFail($productId);
+
+        if (! $product->is_active) {
+            throw new InsufficientStockException(
+                message: "Produk '{$product->title}' saat ini tidak aktif atau tidak tersedia.",
+                errors: [
+                    'product_id' => $product->id,
+                    'title' => $product->title,
+                    'is_active' => false,
+                ]
+            );
+        }
 
         $cartItem = CartItem::where('user_id', $user->id)
             ->where('product_id', $productId)
@@ -98,6 +110,17 @@ class CartService
 
         if (! $cartItem) {
             return null;
+        }
+
+        if (! $cartItem->product || ! $cartItem->product->is_active) {
+            throw new InsufficientStockException(
+                message: "Produk '{$cartItem->product?->title}' saat ini tidak aktif atau tidak tersedia.",
+                errors: [
+                    'product_id' => $cartItem->product_id,
+                    'title' => $cartItem->product?->title,
+                    'is_active' => false,
+                ]
+            );
         }
 
         if ($quantity > $cartItem->product->stock) {

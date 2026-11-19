@@ -1,32 +1,34 @@
 # Product Catalog & Order REST API - Talenavi Backend Technical Test
 
-RESTful API untuk katalog produk, keranjang belanja (*shopping cart*), dan transaksi pesanan (*order checkout*) toko online yang dibangun menggunakan **Laravel 12**, **PHP 8.2+**, **MySQL**, dan **Laravel Sanctum**.
+RESTful API untuk katalog produk, keranjang belanja (*shopping cart*), transaksi pesanan (*order checkout*), dan panel manajemen administrator toko online yang dibangun menggunakan **Laravel 12**, **PHP 8.2+**, **MySQL**, dan **Laravel Sanctum**.
 
-Proyek ini dikembangkan sebagai bagian dari **Technical Test Backend Developer Internship PT Dynamic Talenta Navigator (Talenavi)**.
+Proyek ini dikembangkan secara komprehensif untuk **Technical Test Backend Developer Internship PT Dynamic Talenta Navigator (Talenavi)**, mencakup **seluruh fitur wajib** dan **seluruh fitur opsional (nilai tambah)**.
 
 ---
 
 ## 1. Ringkasan Proyek (Project Overview)
 
-Aplikasi ini merupakan backend RESTful API untuk mendukung operasional toko online sederhana hingga tingkat siap produksi (*production-ready*). Sistem ini menangani seluruh alur transaksi e-commerce, mulai dari autentikasi pengguna, eksplorasi katalog produk publik, pengelolaan keranjang belanja, hingga pemrosesan transaksi *checkout* dan riwayat pesanan.
-
-### Tujuan dan Fitur Utama:
-- **Autentikasi Pengguna**: Pendaftaran dan login akun dengan mekanisme *stateless* menggunakan Bearer Token dari Laravel Sanctum.
-- **Katalog Produk Publik**: Akses katalog produk yang dapat dijelajahi tanpa login, dilengkapi pencarian kata kunci (*search*), filter slug kategori, pengurutan terverifikasi (*whitelisted sorting*), serta pagination dinamis.
-- **Keranjang Belanja (*Shopping Cart*)**: Pengelolaan item keranjang yang terisolasi per pengguna, pencegahan baris ganda untuk produk yang sama, validasi batas stok secara langsung, dan kalkulasi otomatis subtotal serta total harga belanjaan.
-- **Sistem Checkout Aman & Bebas Race Condition**: Checkout dengan jaminan transaksi database atomik (`DB::transaction`) dan penguncian baris pesimistik (*pessimistic row locking* menggunakan `lockForUpdate()`), memastikan tidak terjadi *overselling* maupun *deadlock* saat transaksi bersamaan.
-- **Pencatatan Riwayat Pesanan & Snapshot Harga**: Menyimpan harga produk pada saat checkout secara permanen pada tabel `order_items`, sehingga riwayat transaksi dan faktur pelanggan tetap konsisten meskipun harga produk di katalog berubah sewaktu-waktu.
+Aplikasi ini merupakan backend RESTful API lengkap untuk mendukung operasional toko online modern hingga level *production-ready*. Sistem ini menangani seluruh alur transaksi e-commerce secara terorganisasi, modular, dan aman:
+- **Autentikasi Stateless & Multi-Role**: Registrasi, login, dan pembagian hak akses (*Role-Based Access Control*) antara `customer` dan `admin` menggunakan Bearer Token dari Laravel Sanctum.
+- **Katalog Produk Publik**: Akses katalog produk yang dapat dijelajahi publik, dilengkapi fitur pencarian judul, filter slug kategori, pengurutan terverifikasi (*whitelisted sorting*), serta pagination dinamis. Hanya produk aktif yang ditampilkan di katalog publik.
+- **Panel Administrator (Admin Product CRUD)**: Hak akses khusus admin untuk mengelola seluruh siklus produk (tambah, lihat, ubah, dan nonaktifkan produk).
+- **Keranjang Belanja (*Shopping Cart*)**: Pengelolaan item keranjang yang terisolasi per pengguna, pencegahan baris ganda untuk produk yang sama, validasi batas stok secara langsung, dan kalkulasi otomatis subtotal serta total belanja.
+- **Sistem Checkout Concurrency-Safe**: Checkout dengan jaminan transaksi database atomik (`DB::transaction`) dan penguncian baris pesimistik (*pessimistic row locking* menggunakan `lockForUpdate()`), memastikan tidak terjadi *overselling* maupun *deadlock* saat transaksi berlangsung bersamaan.
+- **Pencatatan Riwayat Pesanan & Snapshot Harga**: Menyimpan harga produk pada saat checkout secara permanen pada tabel `order_items`, sehingga riwayat transaksi dan faktur pelanggan tetap konsisten meskipun harga atau status produk berubah di masa mendatang.
+- **Keamanan, Logging & Ketahanan Produksi**: Rate limiting pada login, pencatatan log terstruktur disertai *Request ID* (`X-Request-ID`), *health check endpoint*, konfigurasi Docker multi-container, dan pengujian otomatis (*automated tests*).
 
 ---
 
 ## 2. Tech Stack
 
-- **Framework**: [Laravel 12](https://laravel.com/)
-- **Bahasa Pemrograman**: PHP `^8.2` (Telah diuji dan sepenuhnya kompatibel dengan PHP 8.2, PHP 8.3, dan PHP 8.5)
+- **Backend Framework**: [Laravel 12](https://laravel.com/)
+- **Bahasa Pemrograman**: PHP `^8.2` (Diuji dan kompatibel penuh pada PHP 8.2, PHP 8.3, dan PHP 8.5)
 - **Database**: MySQL `8.0+` / MariaDB `10.4+` (Engine InnoDB dengan dukungan transaksi ACID dan *row-level locking*)
-- **Autentikasi**: [Laravel Sanctum](https://laravel.com/docs/sanctum) (Bearer Token dengan masa kedaluwarsa yang dapat dikonfigurasi)
-- **Arsitektur API**: RESTful API terstruktur (Controller $\rightarrow$ Service $\rightarrow$ Model/Eloquent) dengan format response JSON seragam
-- **Dokumentasi & Pengujian API**: [Postman](https://www.postman.com/) (Tersedia file Postman Collection v2.1 dan Environment)
+- **Autentikasi**: [Laravel Sanctum](https://laravel.com/docs/sanctum) (Bearer Token dengan masa berlaku dinamis)
+- **Containerization**: Docker & Docker Compose (PHP 8.3 FPM, Nginx Alpine, MySQL 8.0)
+- **Testing Framework**: PHPUnit (38 automated tests mencakup Unit, Feature, Security, dan Concurrency)
+- **Arsitektur API**: Service-Layered RESTful API (Controller $\rightarrow$ Service $\rightarrow$ Eloquent Model)
+- **Dokumentasi & Pengujian API**: [Postman](https://www.postman.com/) (Collection v2.1 dan Environment)
 
 ---
 
@@ -36,7 +38,7 @@ Aplikasi ini merupakan backend RESTful API untuk mendukung operasional toko onli
 
 ### Alasan Teknis & Hubungannya dengan Laravel:
 1. **Dukungan Penuh Transaksi ACID untuk Checkout**:
-   Proses checkout e-commerce melibatkan rangkaian operasi yang saling bergantung: pengecekan ketersediaan stok, pembuatan data pesanan (*order*), pembuatan detail item (*order items*), pemotongan stok inventaris, serta pengosongan keranjang belanja. Mesin InnoDB pada MySQL menyediakan transaksi ACID (*Atomicity, Consistency, Isolation, Durability*) melalui perintah `COMMIT` dan `ROLLBACK`. Jika ada satu langkah yang gagal (misalnya stok produk tidak mencukupi), seluruh perubahan data dibatalkan secara utuh tanpa meninggalkan data yang rusak atau tidak lengkap.
+   Proses checkout e-commerce melibatkan rangkaian operasi yang saling bergantung: pengecekan ketersediaan stok, pembuatan data pesanan (*order*), pembuatan detail item (*order items*), pemotongan stok inventaris, serta pengosongan keranjang belanja. Mesin InnoDB pada MySQL menyediakan transaksi ACID (*Atomicity, Consistency, Isolation, Durability*) melalui perintah `COMMIT` dan `ROLLBACK`. Jika ada satu langkah yang gagal, seluruh perubahan data dibatalkan secara utuh tanpa meninggalkan data yang rusak atau tidak lengkap.
 2. **Pessimistic Row-Level Locking (`FOR UPDATE`)**:
    Pada kondisi tingginya transaksi bersamaan (*high concurrency*), dua pelanggan dapat mencoba membeli produk dengan stok terbatas pada detik yang sama. MySQL InnoDB mendukung penguncian tingkat baris (*row-level locking*) menggunakan klausa `SELECT ... FOR UPDATE` (di Laravel via `lockForUpdate()`). MySQL akan mengunci baris produk yang sedang diperiksa hingga transaksi selesai, mencegah terjadinya pembacaan data kotor (*dirty read*) dan memastikan stok tidak pernah minus tanpa perlu mengunci seluruh tabel.
 3. **Kompatibilitas dan Integrasi Native dengan Laravel**:
@@ -46,56 +48,30 @@ Aplikasi ini merupakan backend RESTful API untuk mendukung operasional toko onli
 
 ## 4. Fitur Aplikasi (Features)
 
-### A. Autentikasi (Authentication)
-- Pendaftaran (*register*) pengguna baru dengan enkripsi password otomatis (`bcrypt`).
-- Login pengguna menggunakan email dan password untuk mendapatkan Bearer Token.
-- Pengaturan masa berlaku token melalui *environment variable* (`SANCTUM_EXPIRATION`).
-- Mengambil informasi profil pengguna yang sedang login (`/api/auth/me`).
+### A. Fitur Wajib (Core Features)
+- **Autentikasi**: Registrasi akun baru (password di-hash dengan Bcrypt), login kredensial, dan endpoint `/api/auth/me`.
+- **Katalog Publik**: Daftar produk dengan pagination (`page`, `limit`), search judul (`q`), filter kategori (`category`), dan sorting terverifikasi (`price_asc`, `price_desc`, `newest`).
+- **Kategori**: Endpoint publik untuk melihat seluruh daftar kategori produk (`/api/categories`).
+- **Keranjang Belanja**: Melihat keranjang dengan kalkulasi subtotal dan total harga, penambahan produk (increment quantity jika sudah ada), update quantity, dan hapus item.
+- **Transaksi Checkout**: Checkout atomic di dalam `DB::transaction()`, validasi stok, row locking `lockForUpdate()`, snapshot harga checkout ke `order_items`, pemotongan stok otomatis, dan pengosongan keranjang belanja.
+- **Riwayat Pesanan**: Melihat daftar riwayat order dan detail order milik pengguna sendiri.
 
-### B. Katalog Produk Publik (Product Catalog)
-- Melihat seluruh daftar produk tanpa perlu login.
-- Pencarian produk berdasarkan nama/judul produk (`?q=wireless`).
-- Filter produk berdasarkan slug kategori (`?category=electronics`).
-- Pilihan sorting yang aman (*whitelisted*): `price_asc` (harga terendah), `price_desc` (harga tertinggi), atau `newest` (terbaru).
-- Pagination dinamis disertai metadata respons lengkap (`page`, `limit` hingga 50, `total`, `total_pages`).
-- Melihat detail produk spesifik beserta data relasi kategorinya (`/api/products/{id}`).
-
-### C. Kategori Produk (Categories)
-- Melihat seluruh daftar kategori produk yang tersedia (`/api/categories`).
-
-### D. Keranjang Belanja (Shopping Cart - Wajib Login)
-- Setiap pengguna hanya dapat melihat dan mengelola isi keranjangnya sendiri (*user-scoped*).
-- Menambah produk ke keranjang: jika produk sudah ada di keranjang, sistem otomatis menambahkan kuantitasnya (*increment*) tanpa membuat baris ganda di database.
-- Validasi stok: kuantitas belanja tidak boleh melebihi sisa stok produk yang tersedia di database.
-- Kalkulasi otomatis nilai subtotal per item dan total harga keseluruhan keranjang.
-- Mengubah kuantitas item keranjang dengan pengecekan stok terkini.
-- Menghapus item dari keranjang belanja.
-
-### E. Checkout Pesanan (Checkout - Wajib Login)
-- Mengubah seluruh isi keranjang belanja pengguna menjadi satu pesanan resmi.
-- Berjalan di dalam satu transaksi database atomik (`DB::transaction`).
-- Menerapkan pengurutan ID produk secara ascending sebelum dikunci untuk mencegah *database deadlock*.
-- Memvalidasi stok setiap item sebelum proses penyimpanan data.
-- Mengembalikan response `HTTP 409 Conflict` dengan detail produk yang stoknya kurang apabila terjadi defisit inventaris.
-- Menyalin dan menyimpan harga produk saat checkout ke tabel `order_items` (*price snapshot*).
-- Memotong stok setiap produk yang dibeli dan mengosongkan keranjang belanja secara otomatis.
-
-### F. Manajemen Pesanan (Order Management - Wajib Login)
-- Melihat daftar riwayat pesanan milik pengguna yang sedang login.
-- Melihat rincian detail pesanan: total bayar, status pesanan, daftar barang yang dibeli, kuantitas, dan harga saat checkout.
-- Proteksi otorisasi: pengguna tidak dapat melihat pesanan milik pengguna lain (sistem merespons dengan HTTP 404 Not Found).
-
-### G. Validasi dan Keamanan
-- Validasi data input yang ketat menggunakan class Laravel `FormRequest`.
-- Format pesan error seragam ketika validasi gagal (HTTP 422 Unprocessable Entity).
-- Perlindungan dari celah SQL Injection menggunakan PDO parameter binding pada seluruh query Eloquent.
-- Penyembunyian error teknis pada mode produksi agar tidak membocorkan query database maupun stack trace internal ke client.
+### B. Fitur Opsional (Nilai Tambah / Added Value)
+- **Docker & Docker Compose**: Menjalankan aplikasi secara terisolasi (PHP-FPM, Nginx, MySQL) hanya dengan satu perintah.
+- **Automated Unit & Integration Tests**: 38 test otomatis mencakup seluruh modul penting menggunakan database testing SQLite in-memory terisolasi.
+- **Penanganan Concurrent Checkout**: Pencegahan race condition dan deadlock menggunakan *deterministic ascending row locking*.
+- **Role Admin & Manajemen Produk**: Middleware `EnsureAdmin` (`admin`) dan endpoint lengkap CRUD produk oleh admin.
+- **Penonaktifan Produk Aman (*Soft Deactivation*)**: Menghapus produk dari sisi admin mengubah `is_active = false`, menyembunyikannya dari katalog publik tanpa merusak riwayat transaksi masa lalu.
+- **Rate Limiting Login**: Maksimal 5 percobaan login gagal per menit per email + IP (HTTP 429 Too Many Requests).
+- **Request & Error Logging**: Pencatatan log otomatis dengan header penelusuran `X-Request-ID` dan sanitasi data sensitif (password/token tidak dicatat).
+- **Health Check Endpoint**: Endpoint publik `/api/health` untuk memantau status aplikasi dan konektivitas database.
+- **Panduan Deployment Production**: Dokumentasi penyiapan di Railway, Render, Fly.io, dan VPS Ubuntu.
 
 ---
 
 ## 5. Desain Database & ERD (Database Design)
 
-Struktur database dirancang dengan 6 tabel utama yang saling terhubung dengan foreign key, index pencarian, dan aturan penghapusan data yang tepat.
+Struktur database dirancang dengan 6 tabel utama yang saling terhubung dengan foreign key, index pencarian, dan aturan penghapusan data yang aman.
 
 ### Entity Relationship Diagram (ERD)
 
@@ -113,6 +89,7 @@ erDiagram
         string name
         string email UK
         string password
+        string role "default: customer"
         timestamp created_at
         timestamp updated_at
     }
@@ -133,6 +110,7 @@ erDiagram
         decimal price
         unsigned_int stock
         string image_url
+        boolean is_active "default: true"
         timestamp created_at
         timestamp updated_at
     }
@@ -166,49 +144,27 @@ erDiagram
     }
 ```
 
-### Spesifikasi Tabel dan Relasi
-
-1. **`users`**:
-   - Kolom: `id`, `name`, `email` (UNIQUE), `password` (hashed), `created_at`, `updated_at`.
-   - Menyimpan data akun pengguna dan pelanggan.
-2. **`categories`**:
-   - Kolom: `id`, `slug` (UNIQUE), `name`, `created_at`, `updated_at`.
-   - Mengelompokkan kategori produk.
-3. **`products`**:
-   - Kolom: `id`, `category_id` (FK ke `categories`), `title` (INDEXED), `description`, `price` (`DECIMAL(12, 2)`), `stock` (`UNSIGNED INT`), `image_url` (nullable), `timestamps`.
-   - Relasi ke kategori menggunakan aturan `restrictOnDelete()` agar kategori yang masih memiliki produk tidak dapat dihapus sembarangan.
-4. **`cart_items`**:
-   - Kolom: `id`, `user_id` (FK ke `users`), `product_id` (FK ke `products`), `quantity` (`INT`), `timestamps`.
-   - Menggunakan aturan **`UNIQUE(user_id, product_id)`** agar setiap pengguna hanya memiliki satu baris keranjang untuk produk yang sama.
-   - Aturan penghapusan `cascadeOnDelete()` jika user atau produk dihapus.
-5. **`orders`**:
-   - Kolom: `id`, `user_id` (FK ke `users`), `total_price` (`DECIMAL(12, 2)`), `status` (default `'pending'`), `timestamps`.
-   - Menyimpan data transaksi pesanan yang telah berhasil dicheckout.
-6. **`order_items`**:
-   - Kolom: `id`, `order_id` (FK ke `orders`), `product_id` (FK ke `products`), `quantity` (`INT`), `price` (`DECIMAL(12, 2)`), `timestamps`.
-   - Relasi foreign key ke `products` dilindungi dengan aturan **`restrictOnDelete()`** agar produk yang pernah dibeli tidak dapat dihapus permanen, sehingga integritas data audit dan riwayat pesanan tetap terjaga selamanya.
-
-### Peran Tabel `orders`, `order_items`, dan Snapshot Harga Produk
-Dalam sistem toko online, harga produk pada tabel `products` bersifat dinamis (dapat berubah karena promo, inflasi, atau perubahan harga dari pihak penjual).
-- Apabila riwayat transaksi hanya mengambil harga dari kolom `products.price`, maka setiap ada perubahan harga di masa mendatang, total belanja pada pesanan lama pelanggan akan ikut berubah dan menyebabkan kekacauan pada laporan keuangan/faktur.
-- **Solusi yang Diterapkan**: Pada saat checkout berhasil diproses, harga aktif produk saat itu disalin langsung ke kolom `order_items.price`. Dengan demikian, riwayat transaksi menjadi bersifat historis (*immutable*), akurat, dan tidak terpengaruh oleh perubahan harga katalog produk di kemudian hari.
+### Spesifikasi Tabel
+1. **`users`**: Menyimpan akun pengguna dengan kolom `role` (`customer` atau `admin`).
+2. **`categories`**: Menyimpan kategori produk dengan slug unik.
+3. **`products`**: Menyimpan katalog produk dengan kolom `is_active` (`true`/`false`) dan foreign key `category_id` beraturan `restrictOnDelete()`.
+4. **`cart_items`**: Menyimpan isi keranjang belanja dengan constraint `UNIQUE(user_id, product_id)`.
+5. **`orders`**: Menyimpan header pesanan transaksi belanja.
+6. **`order_items`**: Menyimpan detail barang yang dibeli beserta snapshot harga saat transaksi (`price`). Foreign key ke `products` dilindungi dengan `restrictOnDelete()` agar integritas audit tidak pernah hilang.
 
 ---
 
 ## 6. Kebutuhan Sistem (Project Requirements)
 
-Sebelum menjalankan aplikasi, pastikan perangkat lokal Anda memenuhi persyaratan berikut:
-- **PHP**: Versi `^8.2` (Sistem telah diuji pada PHP 8.2, 8.3, dan 8.5).
+- **PHP**: Versi `^8.2` (PHP 8.2, PHP 8.3, atau PHP 8.5)
   - Ekstensi PHP wajib: `pdo_mysql`, `openssl`, `mbstring`, `tokenizer`, `xml`, `ctype`, `json`, `bcmath`, `curl`.
-- **Composer**: Versi `2.x+`.
-- **Database Server**: MySQL `8.0+` atau MariaDB `10.4+` (berjalan pada port `3306`).
-- **Git**: Terpasang di terminal komputer Anda.
+- **Composer**: Versi `2.x+`
+- **Database Server**: MySQL `8.0+` atau MariaDB `10.4+` (port `3306`)
+- **Docker & Docker Compose** *(Opsional, jika ingin menjalankan via container)*
 
 ---
 
-## 7. Panduan Instalasi (Installation Guide)
-
-Ikuti langkah-langkah berikut untuk menginstal dan menjalankan aplikasi di komputer lokal:
+## 7. Panduan Instalasi Lokal (Local Installation)
 
 ### Langkah 1: Clone Repository
 ```bash
@@ -222,19 +178,18 @@ composer install
 ```
 
 ### Langkah 3: Siapkan File Environment
-Salin template `.env.example` menjadi `.env`:
 ```bash
 cp .env.example .env
 ```
-*(Pada PowerShell Windows: `Copy-Item .env.example .env`)*
+*(PowerShell: `Copy-Item .env.example .env`)*
 
 ### Langkah 4: Generate Application Key
 ```bash
 php artisan key:generate
 ```
 
-### Langkah 5: Konfigurasi Database MySQL
-Buka file `.env` menggunakan teks editor pilihan Anda dan sesuaikan kredensial database lokal Anda:
+### Langkah 5: Konfigurasi Database & Admin di `.env`
+Buka file `.env` dan sesuaikan kredensial MySQL lokal Anda:
 ```dotenv
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -244,10 +199,13 @@ DB_USERNAME=root
 DB_PASSWORD=
 
 SANCTUM_EXPIRATION=1440
+
+ADMIN_NAME="Store Administrator"
+ADMIN_EMAIL="admin@talenavi.test"
+ADMIN_PASSWORD=AdminSecure123!
 ```
 
-### Langkah 6: Buat Database di MySQL
-Pastikan service MySQL Anda sudah aktif (melalui Laragon / XAMPP / MySQL Service), kemudian buat database:
+### Langkah 6: Buat Database MySQL
 ```sql
 CREATE DATABASE IF NOT EXISTS fico_store;
 ```
@@ -262,214 +220,191 @@ php artisan db:seed
 ```bash
 php artisan serve
 ```
-Aplikasi backend kini aktif dan siap menerima request di: **`http://127.0.0.1:8000`**
+Aplikasi siap diakses pada: **`http://127.0.0.1:8000`**
 
 ---
 
-## 8. Konfigurasi & Setup Database (Database Setup)
+## 8. Menjalankan Aplikasi Menggunakan Docker (Docker Setup)
 
-Struktur tabel dan data awal diisi menggunakan perintah resmi Laravel Artisan:
+Aplikasi telah dilengkapi konfigurasi Docker multi-container (PHP-FPM 8.3, Nginx Web Server, dan MySQL 8.0).
 
+### Langkah Menjalankan Docker:
 ```bash
-# Menjalankan seluruh file migration sesuai urutan dependensi
-php artisan migrate
+# 1. Pastikan Docker Desktop aktif di komputer Anda, lalu jalankan:
+docker compose up -d --build
 
-# Mengisi data awal kategori, produk, dan akun testing
-php artisan db:seed
+# 2. Jalankan migration dan seeder di dalam container app:
+docker compose exec app php artisan migrate --seed
+
+# 3. Aplikasi dapat langsung diakses melalui browser atau Postman di:
+# http://localhost:8000
 ```
 
-### Prinsip Idempotency pada Seeder
-Seluruh seeder (`UserSeeder`, `CategorySeeder`, `ProductSeeder`) menggunakan metode `updateOrCreate()` berdasarkan identifier unik yang stabil (`email`, `slug`, `title`). Anda dapat menjalankan perintah `php artisan db:seed` berkali-kali secara aman tanpa khawatir data menjadi duplikat atau merusak primary key yang sudah ada.
+### Manajemen Docker:
+```bash
+# Menghentikan seluruh container:
+docker compose down
+
+# Melihat log aktivitas container:
+docker compose logs -f app
+
+# Masuk ke terminal container Laravel:
+docker compose exec app sh
+```
+
+*(Catatan: Jika port 8000 sudah digunakan di komputer Anda, ubah variabel `APP_PORT=8080` pada file `.env`)*.
 
 ---
 
-## 9. Autentikasi (Authentication)
+## 9. Menjalankan Automated Tests (Testing)
 
-Autentikasi API menggunakan **Laravel Sanctum** dengan metode **Bearer Token** (*stateless*).
+Aplikasi memiliki **38 automated tests** dengan **147 assertions** yang berjalan di atas database testing SQLite in-memory terisolasi (tidak merusak database MySQL lokal).
 
-- Setiap endpoint yang membutuhkan login wajib menyertakan header HTTP berikut:
+### Cara Menjalankan Test:
+```bash
+# Menjalankan seluruh test suite
+php artisan test
+
+# Menjalankan test spesifik berdasarkan kelompok fitur
+php artisan test --filter=AuthenticationTest
+php artisan test --filter=ProductTest
+php artisan test --filter=CartTest
+php artisan test --filter=OrderTest
+php artisan test --filter=AdminProductTest
+php artisan test --filter=SecurityTest
+```
+
+### Hasil Uji Aktual (Actual Test Results):
+```text
+   PASS  Tests\Unit\ExampleTest
+   PASS  Tests\Unit\Services\OrderServiceTest
+   PASS  Tests\Feature\Api\AdminProductTest (6 tests)
+   PASS  Tests\Feature\Api\AuthenticationTest (7 tests)
+   PASS  Tests\Feature\Api\CartTest (6 tests)
+   PASS  Tests\Feature\Api\OrderTest (5 tests)
+   PASS  Tests\Feature\Api\ProductTest (8 tests)
+   PASS  Tests\Feature\Api\SecurityTest (3 tests)
+   PASS  Tests\Feature\ExampleTest
+
+   Tests:    38 passed (147 assertions)
+   Duration: 1.45s
+```
+
+---
+
+## 10. Autentikasi & Akun Testing (Authentication)
+
+Autentikasi API menggunakan **Laravel Sanctum** dengan metode **Bearer Token**.
+
+- Header wajib untuk endpoint privat:
   ```http
-  Authorization: Bearer <token_anda_di_sini>
+  Authorization: Bearer <token_anda>
   Accept: application/json
   ```
-- Masa berlaku token diatur melalui file konfigurasi `.env` dengan variabel `SANCTUM_EXPIRATION` (standar: `1440` menit atau 24 jam).
-- Permintaan ke endpoint privat tanpa token atau dengan token yang tidak valid/kedaluwarsa akan menghasilkan response `HTTP 401 Unauthorized`.
+- Akun hasil seeder untuk pengujian:
 
-### Akun Testing Hasil Seeder
-Gunakan akun berikut untuk melakukan pengujian login secara langsung:
-
-| Data | Nilai |
-|---|---|
-| **Email** | `test@gmail.com` |
-| **Password** | `123` |
-
-*(Catatan: Password di-hash secara aman menggunakan algoritma Bcrypt bawaan Laravel).*
+| Role | Email | Password | Hak Akses |
+|---|---|---|---|
+| **Customer** | `test@gmail.com` | `123` | Akses katalog, keranjang belanja, dan checkout pesanan sendiri. |
+| **Administrator** | `admin@talenavi.test` | `AdminSecure123!` | Akses seluruh fitur customer + panel Admin Products CRUD. |
 
 ---
 
-## 10. Daftar Endpoint API (API Endpoints)
+## 11. Daftar Endpoint API (API Endpoints)
 
 Base URL: `http://127.0.0.1:8000/api`
 
-### A. Autentikasi (Authentication)
+### A. System & Monitoring
 | Method | Endpoint | Akses | Keterangan |
 |---|---|---|---|
-| `POST` | `/api/auth/register` | Publik | Registrasi akun pengguna baru |
-| `POST` | `/api/auth/login` | Publik | Login dengan email & password untuk mendapatkan Bearer Token |
-| `GET` | `/api/auth/me` | **Bearer Token** | Mengambil data profil user yang sedang login |
+| `GET` | `/api/health` | Publik | Status kesehatan backend dan koneksi database |
 
-### B. Katalog Produk Publik (Products)
+### B. Autentikasi (Authentication)
 | Method | Endpoint | Akses | Keterangan |
 |---|---|---|---|
-| `GET` | `/api/products` | Publik | Menampilkan daftar produk dengan pagination, search, filter, dan sorting |
-| `GET` | `/api/products/{id}` | Publik | Menampilkan detail produk tertentu beserta relasi kategorinya |
+| `POST` | `/api/auth/register` | Publik | Registrasi pengguna baru (`role: customer`) |
+| `POST` | `/api/auth/login` | Publik | Login pengguna (dibatasi 5 percobaan per menit) |
+| `GET` | `/api/auth/me` | **Bearer Token** | Profil pengguna yang sedang login |
 
-**Parameter Query pada `GET /api/products`**:
-- `page`: Nomor halaman (default: `1`).
-- `limit`: Jumlah data per halaman (default: `10`, maksimal: `50`).
-- `q`: Kata kunci pencarian judul produk (contoh: `?q=headphone`).
-- `category`: Filter berdasarkan slug kategori (contoh: `?category=electronics`).
-- `sort`: Pilihan pengurutan yang diizinkan: `price_asc`, `price_desc`, atau `newest`.
-- *Contoh Kombinasi*: `/api/products?q=wireless&category=electronics&sort=price_asc&page=1&limit=10`
-
-### C. Kategori (Categories)
+### C. Katalog Publik (Products & Categories)
 | Method | Endpoint | Akses | Keterangan |
 |---|---|---|---|
-| `GET` | `/api/categories` | Publik | Menampilkan seluruh daftar kategori produk |
+| `GET` | `/api/products` | Publik | Daftar produk aktif (pagination, search `q`, filter `category`, sort) |
+| `GET` | `/api/products/{id}` | Publik | Detail produk aktif beserta kategori |
+| `GET` | `/api/categories` | Publik | Daftar seluruh kategori produk |
 
 ### D. Keranjang Belanja (Cart)
 | Method | Endpoint | Akses | Keterangan |
 |---|---|---|---|
-| `GET` | `/api/cart` | **Bearer Token** | Menampilkan seluruh isi keranjang belanja user beserta total bayar |
-| `POST` | `/api/cart/items` | **Bearer Token** | Menambahkan item ke keranjang (otomatis menambah kuantitas jika sudah ada) |
-| `PATCH` | `/api/cart/items/{id}`| **Bearer Token** | Mengubah kuantitas item di keranjang belanja |
-| `DELETE`| `/api/cart/items/{id}`| **Bearer Token** | Menghapus item dari keranjang belanja |
+| `GET` | `/api/cart` | **Bearer Token** | Melihat isi keranjang dan total harga |
+| `POST` | `/api/cart/items` | **Bearer Token** | Menambah produk ke keranjang (auto-increment jika sudah ada) |
+| `PATCH` | `/api/cart/items/{id}`| **Bearer Token** | Mengubah kuantitas item keranjang |
+| `DELETE`| `/api/cart/items/{id}`| **Bearer Token** | Menghapus item dari keranjang |
 
 ### E. Checkout & Pesanan (Orders)
 | Method | Endpoint | Akses | Keterangan |
 |---|---|---|---|
 | `POST` | `/api/orders` | **Bearer Token** | Checkout seluruh isi keranjang menjadi pesanan |
-| `GET` | `/api/orders` | **Bearer Token** | Menampilkan riwayat pesanan milik user yang sedang login |
-| `GET` | `/api/orders/{id}` | **Bearer Token** | Menampilkan rincian detail pesanan dan harga snapshot saat checkout |
+| `GET` | `/api/orders` | **Bearer Token** | Riwayat pesanan milik pengguna |
+| `GET` | `/api/orders/{id}` | **Bearer Token** | Detail pesanan beserta snapshot harga checkout |
+
+### F. Panel Administrator (Admin Products - Protected `admin`)
+| Method | Endpoint | Akses | Keterangan |
+|---|---|---|---|
+| `GET` | `/api/admin/products` | **Admin Token** | Melihat seluruh produk (aktif maupun nonaktif) |
+| `POST` | `/api/admin/products` | **Admin Token** | Membuat produk baru (`is_active = true`) |
+| `GET` | `/api/admin/products/{id}` | **Admin Token** | Detail produk untuk admin |
+| `PUT` | `/api/admin/products/{id}` | **Admin Token** | Mengubah seluruh data produk |
+| `PATCH` | `/api/admin/products/{id}` | **Admin Token** | Mengubah sebagian data produk (misal stok) |
+| `DELETE`| `/api/admin/products/{id}` | **Admin Token** | Menonaktifkan produk secara aman (`is_active = false`) |
 
 ---
 
-## 11. Dokumentasi API (Postman)
+## 12. Dokumentasi API (Postman)
 
-File Postman Collection dan Environment telah disediakan secara lengkap di dalam folder `docs/`:
-- **Postman Collection**: [`docs/Talenavi-Backend-API.postman_collection.json`](file:///d:/coding/Talenavi/docs/Talenavi-Backend-API.postman_collection.json)
-- **Postman Environment**: [`docs/Talenavi-Local.postman_environment.json`](file:///d:/coding/Talenavi/docs/Talenavi-Local.postman_environment.json)
+File Postman Collection dan Environment telah diperbarui dengan modul Admin dan Rate Limiting:
+- **Collection**: [`docs/Talenavi-Backend-API.postman_collection.json`](file:///d:/coding/Talenavi/docs/Talenavi-Backend-API.postman_collection.json)
+- **Environment**: [`docs/Talenavi-Local.postman_environment.json`](file:///d:/coding/Talenavi/docs/Talenavi-Local.postman_environment.json)
 
-### Cara Import dan Menggunakan di Postman:
-1. Buka aplikasi **Postman**.
-2. Klik tombol **Import** pada pojok kiri atas aplikasi.
-3. Pilih atau geser (*drag & drop*) kedua file JSON di folder `docs/`:
-   - `docs/Talenavi-Backend-API.postman_collection.json`
-   - `docs/Talenavi-Local.postman_environment.json`
-4. Pilih active environment di pojok kanan atas ke **Store Local** (atau **Talenavi Local**).
-5. Variabel Environment yang tersedia:
-   - `base_url`: `http://127.0.0.1:8000` (sudah terisi otomatis).
-   - `token`: Nilai token terisi otomatis setelah Anda menjalankan request **Auth $\rightarrow$ Login**.
-
----
-
-## 12. Alur Business Logic Checkout (Checkout Business Logic)
-
-Seluruh logika bisnis checkout diisolasi secara mandiri pada layer Service di [`app/Services/OrderService.php`](file:///d:/coding/Talenavi/app/Services/OrderService.php) dengan urutan eksekusi sebagai berikut:
-
-```
-[1. Request POST /api/orders] ──> [2. Membuka DB::transaction]
-                                         │
-                                         ▼
-                         [3. Mengambil Cart Item User]
-                                         │
-                                         ├─ Kosong? ──> [Throw EmptyCartException (400)]
-                                         ▼
-                         [4. Mengurutkan ID Produk (Ascending)]
-                                         │
-                                         ▼
-                      [5. Mengunci Produk via lockForUpdate()]
-                                         │
-                                         ▼
-                     [6. Memvalidasi Stok >= Kuantitas Belanja]
-                                         │
-                                         ├─ Stok Kurang? ──> [Throw InsufficientStockException (409)]
-                                         ▼
-                    [7. Menghitung Total Harga (Integer Cents)]
-                                         │
-                                         ▼
-                     [8. Membuat Data Order (Status: pending)]
-                                         │
-                                         ▼
-               [9. Membuat Order Items (Menyimpan Snapshot Harga)]
-                                         │
-                                         ▼
-                   [10. Mengurangi Stok Produk yang Terkunci]
-                                         │
-                                         ▼
-                    [11. Menghapus Seluruh Item di Keranjang]
-                                         │
-                                         ▼
-                     [12. Commit Transaksi & Mengembalikan 201]
-```
-
-### Penjelasan Rinci Alur Checkout:
-1. **Inisialisasi Database Transaction (`DB::transaction`)**:
-   Semua tahapan checkout dijalankan dalam satu transaksi database. Apabila terjadi kegagalan di salah satu tahap, database akan melakukan *rollback* otomatis sehingga tidak ada data yang tersimpan separuh.
-2. **Validasi Keranjang Belanja**:
-   Sistem mengambil item keranjang user aktif. Jika keranjang kosong, checkout langsung digagalkan dengan melempar `EmptyCartException` (`HTTP 400 Bad Request`).
-3. **Pencegahan Deadlock dengan Deterministic ID Ordering**:
-   ID produk yang ada pada keranjang diurutkan secara ascending (`orderBy('id', 'asc')`). Hal ini menjamin bahwa seluruh proses checkout yang berjalan bersamaan selalu mengunci baris produk dengan urutan yang sama, sehingga *circular wait* (kondisi saling tunggu antar-transaksi yang memicu deadlock) dapat dihindari.
-4. **Pessimistic Row Locking (`lockForUpdate`)**:
-   Data produk dibaca menggunakan instruksi `SELECT ... FOR UPDATE`. Permintaan checkout lain yang mencoba menyentuh produk yang sama akan mengantre hingga transaksi aktif selesai.
-5. **Validasi Ketersediaan Stok**:
-   Sistem membandingkan kuantitas pesanan dengan sisa stok produk. Jika ada produk yang stoknya kurang, transaksi dibatalkan dan sistem melempar `InsufficientStockException` (`HTTP 409 Conflict`) yang menyertakan informasi lengkap mengenai produk yang kekurangan stok:
-   ```json
-   {
-     "success": false,
-     "message": "Checkout gagal karena terdapat produk dengan stok tidak mencukupi.",
-     "errors": [
-       {
-         "product_id": 1,
-         "title": "Wireless Noise-Canceling Headphones",
-         "available_stock": 2,
-         "requested_quantity": 5
-       }
-     ]
-   }
-   ```
-6. **Perhitungan Finansial Presisi Tinggi (Integer Cents)**:
-   Perhitungan subtotal dan total harga dikonversi ke satuan sen integer (`(int) round($price * 100)`) sebelum dijumlahkan, menghilangkan potensi bug pembulatan desimal akibat kalkulasi *floating-point*.
-7. **Penyimpanan Order & Order Items**:
-   - Membuat baris baru pada tabel `orders` (`total_price`, `status = 'pending'`).
-   - Membuat baris data pada tabel `order_items` dengan mencatat kuantitas serta snapshot harga produk saat checkout (`order_items.price = products.price`).
-8. **Pengurangan Stok Produk**:
-   Stok masing-masing produk yang terkunci dikurangi sesuai kuantitas yang dibeli menggunakan perintah `$product->decrement('stock', $quantity)`.
-9. **Pengosongan Keranjang**:
-   Semua item dalam keranjang milik user yang bersangkutan dihapus dari database.
-10. **Commit Transaksi**:
-    Transaksi disimpan permanen (*committed*) dan sistem mengembalikan response pesanan lengkap dengan kode status `HTTP 201 Created`.
+### Cara Import dan Penggunaan:
+1. Buka **Postman** dan klik tombol **Import**.
+2. Masukkan kedua file di atas dari folder `docs/`.
+3. Pilih active environment ke **Store Local**.
+4. Variabel Environment yang tersedia:
+   - `base_url`: `http://127.0.0.1:8000`
+   - `token`: Token untuk pengguna biasa (*customer*).
+   - `admin_token`: Token untuk administrator (*admin*).
+   - `product_id`: ID produk untuk pengujian dinamis.
 
 ---
 
-## 13. Keamanan (Security)
+## 13. Penanganan Concurrent Checkout & Row Locking
 
-- **Enkripsi Password**: Password tidak pernah disimpan dalam bentuk teks biasa (*plain text*), melainkan di-hash menggunakan algoritma Bcrypt via facade `Hash::make()`.
-- **Autentikasi Token Sanctum**: Token diverifikasi secara *stateless* dan dicocokkan dengan hash SHA-256 yang tersimpan pada tabel `personal_access_tokens`.
-- **Otorisasi Data Berbasis Pengguna (*User-Scoped Authorization*)**:
-  - Seluruh query keranjang dan pesanan difilter berdasarkan ID pengguna yang sedang login (`$request->user()->id`).
-  - Mengakses atau memodifikasi item keranjang atau pesanan milik pengguna lain akan langsung menghasilkan respon `HTTP 404 Not Found` guna mencegah kebocoran informasi (*data enumeration*).
-  - Client tidak pernah diizinkan mengirimkan kolom `user_id` secara manual pada body request.
-- **Pencegahan SQL Injection**: Seluruh komunikasi dengan database memanfaatkan Eloquent ORM dan Laravel Query Builder dengan prepared statements dan parameter binding. Parameter sorting menggunakan pencocokan daftar putih (*whitelist matching*) sehingga input mentah dari client tidak pernah disambungkan langsung ke query SQL.
-- **Validasi Input**: Seluruh input dari client divalidasi dan disanitasi secara ketat menggunakan class `FormRequest`.
+Ketika beberapa pengguna melakukan checkout bersamaan untuk produk dengan stok terbatas, sistem mencegah *race condition* dan *overselling* melalui:
+1. **`DB::transaction()`**: Menjalankan seluruh proses checkout dalam satu unit kerja atomik.
+2. **`lockForUpdate()` (Pessimistic Locking)**: Membaca baris produk dengan perintah SQL `SELECT ... FOR UPDATE` pada MySQL InnoDB.
+3. **Pencegahan Deadlock**: Mengurutkan ID produk secara ascending (`orderBy('id', 'asc')`) sebelum dikunci sehingga urutan penguncian selalu deterministik.
+4. **Validasi Stok & Status Aktif**: Jika stok kurang atau produk nonaktif, checkout digagalkan (HTTP 409 Conflict) dan transaksi di-rollback secara utuh tanpa ada order parsial.
+
+> Untuk instruksi pengujian paralel menggunakan dua koneksi MySQL independen, silakan baca dokumentasi khusus di [`docs/concurrency-testing.md`](file:///d:/coding/Talenavi/docs/concurrency-testing.md).
 
 ---
 
-## 14. Format Response & Penanganan Error (Error Handling)
+## 14. Keamanan & Monitoring (Security & Logging)
+
+- **Rate Limiting Login**: Endpoint `POST /api/auth/login` dilindungi dengan pembatasan maksimal **5 percobaan per menit per email + IP**. Percobaan ke-6 menghasilkan respon `HTTP 429 Too Many Requests`.
+- **Request & Error Logging**: Setiap request API dicatat secara otomatis melalui middleware [`app/Http/Middleware/LogApiRequest.php`](file:///d:/coding/Talenavi/app/Http/Middleware/LogApiRequest.php) ke channel daily (`storage/logs/laravel-YYYY-MM-DD.log`).
+- **Header Pelacakan `X-Request-ID`**: Setiap response menyertakan header `X-Request-ID` unik (UUIDv4) untuk mempermudah audit dan debugging sistem.
+- **Sanitasi Data Sensitif**: Parameter sensitif (password, Bearer Token, Authorization header) tidak pernah dicatat ke dalam log.
+- **Otorisasi Ketat Berbasis User**: Pengguna hanya dapat mengakses dan memanipulasi keranjang dan order miliknya sendiri. Akses ke resource milik pengguna lain menghasilkan `HTTP 404 Not Found`.
+
+---
+
+## 15. Format Response & Penanganan Error (Error Handling)
 
 Format JSON response telah distandarisasi di seluruh endpoint menggunakan helper [`app/Support/ApiResponse.php`](file:///d:/coding/Talenavi/app/Support/ApiResponse.php).
 
-### Format Response Sukses (`200 OK` / `201 Created`)
+### Response Sukses (`200 OK` / `201 Created`)
 ```json
 {
   "success": true,
@@ -484,38 +419,27 @@ Format JSON response telah distandarisasi di seluruh endpoint menggunakan helper
 }
 ```
 
-### Format Response Error (`400`, `401`, `403`, `404`, `409`, `422`, `500`)
+### Response Error (`400`, `401`, `403`, `404`, `409`, `422`, `429`, `500`)
 ```json
 {
   "success": false,
-  "message": "Validation failed",
-  "errors": {
-    "email": [
-      "Email sudah terdaftar."
-    ]
-  }
+  "message": "Too many login attempts. Please try again later.",
+  "errors": null
 }
 ```
 
-### Daftar HTTP Status Code yang Digunakan
+---
 
-| Kode Status | Kategori | Penggunaan pada Aplikasi |
-|---|---|---|
-| **200 OK** | Sukses | Response standar untuk operasi GET, PATCH, dan DELETE yang berhasil. |
-| **201 Created** | Sukses Dibuat | Berhasil registrasi user, menambah item keranjang, atau menyelesaikan checkout order. |
-| **400 Bad Request** | Permintaan Salah | Permintaan tidak dapat diproses (misalnya mencoba checkout keranjang yang kosong). |
-| **401 Unauthorized** | Tidak Terautentikasi | Token tidak disertakan, kedaluwarsa, tidak valid, atau kredensial login salah. |
-| **403 Forbidden** | Terlarang | Pengguna tidak memiliki hak akses terhadap tindakan terkait. |
-| **404 Not Found** | Tidak Ditemukan | Data tidak ditemukan atau data milik user lain (disamarkan sebagai 404 demi keamanan). |
-| **409 Conflict** | Konflik Bisnis | Permintaan kuantitas melebihi sisa stok produk yang tersedia di inventaris. |
-| **422 Unprocessable Entity** | Validasi Gagal | Data yang dikirimkan pada body request tidak memenuhi aturan Form Request. |
-| **500 Internal Server Error** | Kesalahan Server | Kesalahan internal server (pesan error disanitasi agar tidak membocorkan query database). |
+## 16. Kesiapan Deployment (Deployment Readiness)
+
+Aplikasi telah memenuhi kriteria *production deployment*. Panduan penyiapan production, konfigurasi HTTPS, backup database, dan deployment ke Railway, Render, Fly.io, maupun VPS Ubuntu dapat dibaca secara lengkap pada:
+👉 [`docs/deployment.md`](file:///d:/coding/Talenavi/docs/deployment.md).
+
+*(Catatan: Deployment aktual ke platform cloud publik memerlukan konfigurasi akun hosting dan secret environment production dari pengguna)*.
 
 ---
 
-## 15. Struktur Direktori Repository (Repository Structure)
-
-Berikut adalah struktur folder dan file utama yang ada di dalam project:
+## 17. Struktur Direktori Repository (Repository Structure)
 
 ```
 Talenavi/
@@ -526,18 +450,25 @@ Talenavi/
 │   ├── Http/
 │   │   ├── Controllers/
 │   │   │   ├── Api/
+│   │   │   │   ├── AdminProductController.php
 │   │   │   │   ├── AuthController.php
 │   │   │   │   ├── CartController.php
 │   │   │   │   ├── CategoryController.php
+│   │   │   │   ├── HealthCheckController.php
 │   │   │   │   ├── OrderController.php
 │   │   │   │   └── ProductController.php
 │   │   │   └── Controller.php
+│   │   ├── Middleware/
+│   │   │   ├── EnsureAdmin.php
+│   │   │   └── LogApiRequest.php
 │   │   └── Requests/
 │   │       ├── AddToCartRequest.php
 │   │       ├── LoginRequest.php
 │   │       ├── ProductQueryRequest.php
 │   │       ├── RegisterRequest.php
-│   │       └── UpdateCartItemRequest.php
+│   │       ├── StoreProductRequest.php
+│   │       ├── UpdateCartItemRequest.php
+│   │       └── UpdateProductRequest.php
 │   ├── Models/
 │   │   ├── CartItem.php
 │   │   ├── Category.php
@@ -545,6 +476,8 @@ Talenavi/
 │   │   ├── OrderItem.php
 │   │   ├── Product.php
 │   │   └── User.php
+│   ├── Providers/
+│   │   └── AppServiceProvider.php
 │   ├── Services/
 │   │   ├── AuthService.php
 │   │   ├── CartService.php
@@ -566,18 +499,41 @@ Talenavi/
 │   │   ├── 2026_11_19_073342_create_products_table.php
 │   │   ├── 2026_11_19_073343_create_cart_items_table.php
 │   │   ├── 2026_11_19_073344_create_orders_table.php
-│   │   └── 2026_11_19_073345_create_order_items_table.php
+│   │   ├── 2026_11_19_073345_create_order_items_table.php
+│   │   ├── 2026_11_19_170555_add_role_to_users_table.php
+│   │   └── 2026_11_19_170557_add_is_active_to_products_table.php
 │   └── seeders/
+│       ├── AdminSeeder.php
 │       ├── CategorySeeder.php
 │       ├── DatabaseSeeder.php
 │       ├── ProductSeeder.php
 │       └── UserSeeder.php
 ├── docs/
+│   ├── concurrency-testing.md
+│   ├── deployment.md
 │   ├── Talenavi-Backend-API.postman_collection.json
 │   └── Talenavi-Local.postman_environment.json
+├── nginx/
+│   └── default.conf
 ├── routes/
 │   └── api.php
+├── tests/
+│   ├── Feature/
+│   │   └── Api/
+│   │       ├── AdminProductTest.php
+│   │       ├── AuthenticationTest.php
+│   │       ├── CartTest.php
+│   │       ├── OrderTest.php
+│   │       ├── ProductTest.php
+│   │       └── SecurityTest.php
+│   └── Unit/
+│       └── Services/
+│           └── OrderServiceTest.php
+├── .dockerignore
 ├── .env.example
 ├── composer.json
+├── docker-compose.yml
+├── Dockerfile
+├── phpunit.xml
 └── README.md
 ```

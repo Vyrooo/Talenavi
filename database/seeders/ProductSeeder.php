@@ -321,6 +321,7 @@ class ProductSeeder extends Seeder
                     'price' => $item['price'],
                     'stock' => $item['stock'],
                     'image_url' => $item['image_url'],
+                    'is_active' => true,
                 ]
             );
         }

@@ -38,23 +38,32 @@ class OrderService
                 ->get()
                 ->keyBy('id');
 
-            // 3. Verify stock availability for each cart item
+            // 3. Verify stock availability and active status for each cart item
             $insufficientItems = [];
             foreach ($cartItems as $item) {
                 $product = $products->get($item->product_id);
-                if (! $product || $product->stock < $item->quantity) {
+                if (! $product || ! $product->is_active) {
                     $insufficientItems[] = [
                         'product_id' => $item->product_id,
                         'title' => $product?->title ?? 'Produk tidak ditemukan',
                         'available_stock' => $product?->stock ?? 0,
                         'requested_quantity' => $item->quantity,
+                        'reason' => 'Produk dinonaktifkan atau tidak tersedia.',
+                    ];
+                } elseif ($product->stock < $item->quantity) {
+                    $insufficientItems[] = [
+                        'product_id' => $item->product_id,
+                        'title' => $product->title,
+                        'available_stock' => $product->stock,
+                        'requested_quantity' => $item->quantity,
+                        'reason' => 'Stok produk tidak mencukupi.',
                     ];
                 }
             }
 
             if (! empty($insufficientItems)) {
                 throw new InsufficientStockException(
-                    message: 'Checkout gagal karena terdapat produk dengan stok tidak mencukupi.',
+                    message: 'Checkout gagal karena terdapat produk yang tidak tersedia atau stok tidak mencukupi.',
                     errors: $insufficientItems
                 );
             }
@@ -98,7 +107,7 @@ class OrderService
             CartItem::where('user_id', $user->id)->delete();
 
             // Return order with eager loaded relations
-            return $order->load(['orderItems.product:id,title,image_url']);
+            return $order->load(['orderItems.product:id,title,image_url,is_active']);
         });
     }
 
@@ -107,7 +116,7 @@ class OrderService
      */
     public function getUserOrders(User $user): Collection
     {
-        return Order::with(['orderItems.product:id,title,image_url'])
+        return Order::with(['orderItems.product:id,title,image_url,is_active'])
             ->where('user_id', $user->id)
             ->orderBy('created_at', 'desc')
             ->get();
@@ -118,7 +127,7 @@ class OrderService
      */
     public function getUserOrderDetail(User $user, int|string $orderId): ?Order
     {
-        return Order::with(['orderItems.product:id,title,image_url'])
+        return Order::with(['orderItems.product:id,title,image_url,is_active'])
             ->where('id', $orderId)
             ->where('user_id', $user->id)
             ->first();
