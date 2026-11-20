@@ -168,7 +168,7 @@ erDiagram
 
 ### Langkah 1: Clone Repository
 ```bash
-git clone https://github.com/<username-anda>/Talenavi.git
+git clone https://github.com/Vyrooo/Talenavi.git
 cd Talenavi
 ```
 
