@@ -1,7 +1,7 @@
 {
   "info": {
     "_postman_id": "76be7611-0e07-4fba-8879-1049d6482f91",
-    "name": "Fico Store Backend API FIX",
+    "name": "Fico Store Backend API",
     "description": "# Fico Store Backend API\n\nAPI ini merupakan backend untuk aplikasi toko/e-commerce **Fico Store**. API ini menyediakan berbagai endpoint untuk mendukung operasional toko secara lengkap, mulai dari autentikasi pengguna, pengelolaan produk, keranjang belanja, hingga pemrosesan pesanan\n\n---\n\n## 🔐 Autentikasi\n\nModul ini menangani proses registrasi dan login pengguna, serta pengambilan data pengguna yang sedang aktif (terautentikasi)\n\n- **Register User** — Mendaftarkan pengguna baru ke sistem\n    \n- **Login** — Melakukan autentikasi pengguna dan mendapatkan token akses\n    \n- **Mendapatkan Data User yang Sedang Login** — Mengambil informasi profil pengguna berdasarkan token yang aktif\n    \n\n---\n\n## 🛍️ Produk\n\nModul ini menyediakan endpoint untuk menjelajahi katalog produk yang tersedia di toko\n\n- **Daftar Kategori** — Mengambil seluruh daftar kategori produk\n    \n- **Daftar Produk** — Menampilkan daftar produk dengan dukungan pengurutan\n    \n- **Detail Produk** — Mengambil informasi lengkap dari sebuah produk berdasarkan ID-nya\n    \n\n---\n\n## 🛒 Keranjang\n\nModul ini mengelola keranjang belanja pengguna, termasuk penambahan, perubahan jumlah, dan penghapusan item\n\n- **Isi Keranjang** — Menampilkan seluruh item yang ada di keranjang belanja pengguna\n    \n- **Tambah Produk ke Keranjang** — Menambahkan produk baru ke dalam keranjang\n    \n- **Mengubah Quantity** — Memperbarui jumlah item tertentu di keranjang\n    \n- **Menghapus Item Keranjang** — Menghapus item tertentu dari keranjang belanja\n    \n\n---\n\n## 📦 Pesanan\n\nModul ini menangani proses checkout dan riwayat pesanan pengguna\n\n- **Checkout** — Memproses pembelian dari item yang ada di keranjang belanja\n    \n- **Riwayat Order** — Menampilkan seluruh riwayat pesanan milik pengguna\n    \n- **Detail Order** — Mengambil informasi lengkap dari sebuah pesanan berdasarkan ID-nya\n    \n\n---\n\n## 📋 Contoh Respons\n\nSetiap request dalam koleksi ini dilengkapi dengan contoh respons yang terdokumentasi, mencakup:\n\n- **Respons sukses** — Contoh data yang dikembalikan saat request berhasil diproses\n    \n- **Respons error** — Contoh pesan kesalahan untuk berbagai skenario, seperti validasi gagal, data tidak ditemukan, kredensial tidak valid, dan stok tidak mencukupi\n    \n\n---\n\n## 🚀 Cara Memulai\n\n1. Pastikan environment **Store Local** sudah aktif dan variabel `base_url` telah dikonfigurasi\n    \n2. Lakukan **Register** atau **Login** untuk mendapatkan token akses\n    \n3. Simpan token ke variabel environment `token` agar dapat digunakan pada endpoint yang memerlukan autentikasi\n    \n4. Jelajahi endpoint **Produk**, **Keranjang**, dan **Pesanan** sesuai kebutuhan",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "60304537",
@@ -2242,12 +2242,11 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/admin/products?page=1&limit=10",
+              "raw": "{{base_url}}/admin/products?page=1&limit=10",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
-                "api",
                 "admin",
                 "products"
               ],
@@ -2349,12 +2348,11 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}/api/admin/products",
+              "raw": "{{base_url}}/admin/products",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
-                "api",
                 "admin",
                 "products"
               ]
@@ -2396,12 +2394,11 @@
                   }
                 },
                 "url": {
-                  "raw": "{{base_url}}/api/admin/products",
+                  "raw": "{{base_url}}/admin/products",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
-                    "api",
                     "admin",
                     "products"
                   ]
@@ -2449,12 +2446,11 @@
                   }
                 },
                 "url": {
-                  "raw": "{{base_url}}/api/admin/products",
+                  "raw": "{{base_url}}/admin/products",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
-                    "api",
                     "admin",
                     "products"
                   ]
@@ -2491,12 +2487,11 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/admin/products/{{product_id}}",
+              "raw": "{{base_url}}/admin/products/{{product_id}}",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
-                "api",
                 "admin",
                 "products",
                 "{{product_id}}"
@@ -2526,12 +2521,11 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/api/admin/products/{{product_id}}",
+                  "raw": "{{base_url}}/admin/products/{{product_id}}",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
-                    "api",
                     "admin",
                     "products",
                     "{{product_id}}"
@@ -2567,12 +2561,11 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/api/admin/products/{{product_id}}",
+                  "raw": "{{base_url}}/admin/products/{{product_id}}",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
-                    "api",
                     "admin",
                     "products",
                     "{{product_id}}"
@@ -2623,12 +2616,11 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}/api/admin/products/{{product_id}}",
+              "raw": "{{base_url}}/admin/products/{{product_id}}",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
-                "api",
                 "admin",
                 "products",
                 "{{product_id}}"
@@ -2689,12 +2681,11 @@
               }
             },
             "url": {
-              "raw": "{{base_url}}/api/admin/products/{{product_id}}",
+              "raw": "{{base_url}}/admin/products/{{product_id}}",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
-                "api",
                 "admin",
                 "products",
                 "{{product_id}}"
@@ -2737,12 +2728,11 @@
                   }
                 },
                 "url": {
-                  "raw": "{{base_url}}/api/admin/products/{{product_id}}",
+                  "raw": "{{base_url}}/admin/products/{{product_id}}",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
-                    "api",
                     "admin",
                     "products",
                     "{{product_id}}"
@@ -2780,12 +2770,11 @@
               }
             ],
             "url": {
-              "raw": "{{base_url}}/api/admin/products/{{product_id}}",
+              "raw": "{{base_url}}/admin/products/{{product_id}}",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
-                "api",
                 "admin",
                 "products",
                 "{{product_id}}"
@@ -2815,12 +2804,11 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{base_url}}/api/admin/products/{{product_id}}",
+                  "raw": "{{base_url}}/admin/products/{{product_id}}",
                   "host": [
                     "{{base_url}}"
                   ],
                   "path": [
-                    "api",
                     "admin",
                     "products",
                     "{{product_id}}"
@@ -2854,12 +2842,11 @@
           }
         ],
         "url": {
-          "raw": "{{base_url}}/api/health",
+          "raw": "{{base_url}}/health",
           "host": [
             "{{base_url}}"
           ],
           "path": [
-            "api",
             "health"
           ]
         },
@@ -2877,15 +2864,62 @@
               }
             ],
             "url": {
-              "raw": ""
+              "raw": "{{base_url}}/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "health"
+              ]
             }
           },
           "status": "OK",
           "code": 200,
           "_postman_previewlanguage": "json",
-          "header": [],
+          "header": [
+            {
+              "key": "Server",
+              "value": "nginx/1.31.9"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache, private"
+            },
+            {
+              "key": "Date",
+              "value": "Fri, 20 Nov 2026 04:09:40 GMT"
+            },
+            {
+              "key": "X-Request-ID",
+              "value": "fa807600-443d-4a4b-98d2-65649450c781"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "X-Frame-Options",
+              "value": "SAMEORIGIN"
+            },
+            {
+              "key": "X-Content-Type-Options",
+              "value": "nosniff"
+            }
+          ],
           "cookie": [],
-          "body": "{\n    \"success\": true,\n    \"message\": \"Aplikasi berjalan normal.\",\n    \"data\": {\n        \"status\": \"healthy\",\n        \"timestamp\": \"2026-11-20T00:00:00+07:00\",\n        \"services\": {\n            \"database\": \"ok\"\n        }\n    },\n    \"meta\": null\n}"
+          "body": "{\n  \"success\": true,\n  \"message\": \"Aplikasi berjalan normal.\",\n  \"data\": {\n    \"status\": \"healthy\",\n    \"timestamp\": \"2026-11-20T04:09:40+00:00\",\n    \"services\": {\n      \"database\": \"ok\"\n    }\n  },\n  \"meta\": null\n}"
         }
       ]
     }
