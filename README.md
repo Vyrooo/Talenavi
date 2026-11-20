@@ -363,8 +363,8 @@ Base URL: `http://127.0.0.1:8000/api`
 ## 12. Dokumentasi API (Postman)
 
 File Postman Collection dan Environment telah diperbarui dengan modul Admin dan Rate Limiting:
-- **Collection**: [`docs/Talenavi-Backend-API.postman_collection.json`](file:///d:/coding/Talenavi/docs/Talenavi-Backend-API.postman_collection.json)
-- **Environment**: [`docs/Talenavi-Local.postman_environment.json`](file:///d:/coding/Talenavi/docs/Talenavi-Local.postman_environment.json)
+- **Collection**: [`docs/Fico-Store-Backend-API.postman_collection.json`](file:///d:/coding/Talenavi/docs/Fico-Store-Backend-API.postman_collection.json)
+- **Environment**: [`docs/Store-Local.postman_environment.json`](file:///d:/coding/Talenavi/docs/Store-Local.postman_environment.json)
 
 ### Cara Import dan Penggunaan:
 1. Buka **Postman** dan klik tombol **Import**.
@@ -509,10 +509,8 @@ Talenavi/
 │       ├── ProductSeeder.php
 │       └── UserSeeder.php
 ├── docs/
-│   ├── concurrency-testing.md
-│   ├── deployment.md
-│   ├── Talenavi-Backend-API.postman_collection.json
-│   └── Talenavi-Local.postman_environment.json
+│   ├── Fico-Store-Backend-API.postman_collection.json
+│   └── Store-Local.postman_environment.json
 ├── nginx/
 │   └── default.conf
 ├── routes/

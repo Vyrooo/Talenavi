@@ -1,0 +1,2893 @@
+{
+  "info": {
+    "_postman_id": "76be7611-0e07-4fba-8879-1049d6482f91",
+    "name": "Fico Store Backend API FIX",
+    "description": "# Fico Store Backend API\n\nAPI ini merupakan backend untuk aplikasi toko/e-commerce **Fico Store**. API ini menyediakan berbagai endpoint untuk mendukung operasional toko secara lengkap, mulai dari autentikasi pengguna, pengelolaan produk, keranjang belanja, hingga pemrosesan pesanan\n\n---\n\n## 🔐 Autentikasi\n\nModul ini menangani proses registrasi dan login pengguna, serta pengambilan data pengguna yang sedang aktif (terautentikasi)\n\n- **Register User** — Mendaftarkan pengguna baru ke sistem\n    \n- **Login** — Melakukan autentikasi pengguna dan mendapatkan token akses\n    \n- **Mendapatkan Data User yang Sedang Login** — Mengambil informasi profil pengguna berdasarkan token yang aktif\n    \n\n---\n\n## 🛍️ Produk\n\nModul ini menyediakan endpoint untuk menjelajahi katalog produk yang tersedia di toko\n\n- **Daftar Kategori** — Mengambil seluruh daftar kategori produk\n    \n- **Daftar Produk** — Menampilkan daftar produk dengan dukungan pengurutan\n    \n- **Detail Produk** — Mengambil informasi lengkap dari sebuah produk berdasarkan ID-nya\n    \n\n---\n\n## 🛒 Keranjang\n\nModul ini mengelola keranjang belanja pengguna, termasuk penambahan, perubahan jumlah, dan penghapusan item\n\n- **Isi Keranjang** — Menampilkan seluruh item yang ada di keranjang belanja pengguna\n    \n- **Tambah Produk ke Keranjang** — Menambahkan produk baru ke dalam keranjang\n    \n- **Mengubah Quantity** — Memperbarui jumlah item tertentu di keranjang\n    \n- **Menghapus Item Keranjang** — Menghapus item tertentu dari keranjang belanja\n    \n\n---\n\n## 📦 Pesanan\n\nModul ini menangani proses checkout dan riwayat pesanan pengguna\n\n- **Checkout** — Memproses pembelian dari item yang ada di keranjang belanja\n    \n- **Riwayat Order** — Menampilkan seluruh riwayat pesanan milik pengguna\n    \n- **Detail Order** — Mengambil informasi lengkap dari sebuah pesanan berdasarkan ID-nya\n    \n\n---\n\n## 📋 Contoh Respons\n\nSetiap request dalam koleksi ini dilengkapi dengan contoh respons yang terdokumentasi, mencakup:\n\n- **Respons sukses** — Contoh data yang dikembalikan saat request berhasil diproses\n    \n- **Respons error** — Contoh pesan kesalahan untuk berbagai skenario, seperti validasi gagal, data tidak ditemukan, kredensial tidak valid, dan stok tidak mencukupi\n    \n\n---\n\n## 🚀 Cara Memulai\n\n1. Pastikan environment **Store Local** sudah aktif dan variabel `base_url` telah dikonfigurasi\n    \n2. Lakukan **Register** atau **Login** untuk mendapatkan token akses\n    \n3. Simpan token ke variabel environment `token` agar dapat digunakan pada endpoint yang memerlukan autentikasi\n    \n4. Jelajahi endpoint **Produk**, **Keranjang**, dan **Pesanan** sesuai kebutuhan",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "60304537",
+    "_collection_link": "https://go.postman.co/collection/60304537-76be7611-0e07-4fba-8879-1049d6482f91?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Fico\",\r\n    \"email\": \"fico@gmail.com\",\r\n    \"password\": \"fico123\",\r\n    \"password_confirmation\": \"fico123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Mendaftarkan pengguna baru dengan mengisi data nama, email, dan password"
+          },
+          "response": [
+            {
+              "name": "201 - Register Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"name\": \"Fico\",\r\n    \"email\": \"fico@gmail.com\",\r\n    \"password\": \"fico1234\",\r\n    \"password_confirmation\": \"fico1234\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/register",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "register"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 08:35:33 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Registrasi berhasil\",\n    \"data\": {\n        \"token\": \"1|HgttfQlb7mtELA05SeZnfKtUVRfjSTWAGiDs0Csu921cc2d4\",\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"name\": \"Fico\",\n            \"email\": \"fico@gmail.com\",\n            \"updated_at\": \"2026-11-19T08:35:33.000000Z\",\n            \"created_at\": \"2026-11-19T08:35:33.000000Z\",\n            \"id\": 2\n        }\n    },\n    \"meta\": null\n}"
+            },
+            {
+              "name": "422 - Validation Error",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"name\": \"Fico\",\r\n    \"email\": \"fico@gmail.com\",\r\n    \"password\": \"fico123\",\r\n    \"password_confirmation\": \"fico123\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/register",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "register"
+                  ]
+                }
+              },
+              "status": "Unprocessable Content",
+              "code": 422,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 08:39:52 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": false,\n    \"message\": \"Validation failed\",\n    \"errors\": {\n        \"email\": [\n            \"Email sudah terdaftar.\"\n        ],\n        \"password\": [\n            \"Password minimal 8 karakter.\"\n        ]\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();\r\n\r\nconst token =\r\n    response?.data?.token ??\r\n    response?.data?.access_token ??\r\n    response?.token;\r\n\r\nif (pm.response.code === 200 && token) {\r\n    pm.environment.set(\"token\", token);\r\n    console.log(\"Token berhasil disimpan.\");\r\n}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\": \"fico@gmail.com\",\r\n    \"password\": \"fico1234\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Mengautentikasi pengguna dan mengembalikan token akses untuk sesi berikutnya"
+          },
+          "response": [
+            {
+              "name": "200 - Login Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\": \"fico@gmail.com\",\r\n    \"password\": \"fico1234\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 08:37:51 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Login berhasil\",\n    \"data\": {\n        \"token\": \"2|hF7AwEeHRDEwQGE3sgbfCxy98BrOtdW4vr8cQgvs20670685\",\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": 2,\n            \"name\": \"Fico\",\n            \"email\": \"fico@gmail.com\",\n            \"email_verified_at\": null,\n            \"created_at\": \"2026-11-19T08:35:33.000000Z\",\n            \"updated_at\": \"2026-11-19T08:35:33.000000Z\"\n        }\n    },\n    \"meta\": null\n}"
+            },
+            {
+              "name": "401 - Invalid Credentials",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\": \"fico@gmail.com\",\r\n    \"password\": \"fico123\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 08:41:01 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": false,\n    \"message\": \"Email atau password salah.\"\n}"
+            },
+            {
+              "name": "Error 429 - Too Many Login Attempts",
+              "originalRequest": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"email\": \"fico@gmail.com\",\r\n    \"password\": \"fico1234\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                },
+                "description": "Mengautentikasi pengguna dan mengembalikan token akses untuk sesi berikutnya"
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"success\": false,\n    \"message\": \"Too many login attempts. Please try again later.\",\n    \"errors\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const response = pm.response.json();",
+                  "const token = response?.data?.token ?? response?.data?.access_token ?? response?.token;",
+                  "if (pm.response.code === 200 && token) {",
+                  "    pm.environment.set(\"admin_token\", token);",
+                  "    console.log(\"Admin token berhasil disimpan ke environment variable admin_token.\");",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@gmail.com\",\n    \"password\": \"{{admin_password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login sebagai Administrator (admin@gmail.com). Password mengambil dari variabel environment {{admin_password}}. Token yang didapat akan otomatis disimpan ke variabel {{admin_token}}."
+          },
+          "response": [
+            {
+              "name": "Success 200 - Admin Login",
+              "originalRequest": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"email\": \"admin@gmail.com\",\n    \"password\": \"{{admin_password}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ]
+                },
+                "description": "Login sebagai Administrator (admin@gmail.com). Password mengambil dari variabel environment {{admin_password}}. Token yang didapat akan otomatis disimpan ke variabel {{admin_token}}."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Login berhasil\",\n    \"data\": {\n        \"token\": \"2|admin_personal_access_token_example\",\n        \"token_type\": \"Bearer\",\n        \"user\": {\n            \"id\": 1,\n            \"name\": \"Store Administrator\",\n            \"email\": \"admin@gmail.com\",\n            \"role\": \"admin\",\n            \"created_at\": \"2026-11-20T00:00:00.000000Z\"\n        }\n    },\n    \"meta\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "Mendapatkan data User yang sedang login",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Mengambil data profil pengguna yang sedang terautentikasi berdasarkan token"
+          },
+          "response": [
+            {
+              "name": "200 - Authenticated",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/auth/me",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "me"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 08:45:23 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Data user berhasil diambil\",\n    \"data\": {\n        \"id\": 2,\n        \"name\": \"Fico\",\n        \"email\": \"fico@gmail.com\",\n        \"email_verified_at\": null,\n        \"created_at\": \"2026-11-19T08:35:33.000000Z\",\n        \"updated_at\": \"2026-11-19T08:35:33.000000Z\"\n    },\n    \"meta\": null\n}"
+            },
+            {
+              "name": "401 - Unauthorized",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/auth/me",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "me"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 08:46:39 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": false,\n    \"message\": \"Unauthenticated. Token tidak valid atau tidak disertakan.\"\n}"
+            },
+            {
+              "name": "Error 429 - Too Many Login Attempts",
+              "originalRequest": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/auth/me",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "me"
+                  ]
+                },
+                "description": "Mengambil data profil pengguna yang sedang terautentikasi berdasarkan token"
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"success\": false,\n    \"message\": \"Too many login attempts. Please try again later.\",\n    \"errors\": null\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Mengelola semua alur autentikasi pengguna, termasuk registrasi akun baru, login, dan pengambilan data profil pengguna yang sedang aktif. Endpoint-endpoint ini bertanggung jawab atas pengelolaan identitas dan token sesi yang diperlukan untuk mengakses sumber daya yang dilindungi di seluruh API"
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Daftar Kategori",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/categories=1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "categories=1"
+              ]
+            },
+            "description": "Mengambil daftar semua kategori produk yang tersedia di toko"
+          },
+          "response": [
+            {
+              "name": "200 - Category List",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/categories",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "categories"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 09:04:09 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Daftar kategori berhasil diambil\",\n    \"data\": [\n        {\n            \"id\": 5,\n            \"slug\": \"beauty-health\",\n            \"name\": \"Beauty & Health\",\n            \"created_at\": \"2026-11-19T08:35:25.000000Z\",\n            \"updated_at\": \"2026-11-19T08:35:25.000000Z\"\n        },\n        {\n            \"id\": 1,\n            \"slug\": \"electronics\",\n            \"name\": \"Electronics\",\n            \"created_at\": \"2026-11-19T08:35:25.000000Z\",\n            \"updated_at\": \"2026-11-19T08:35:25.000000Z\"\n        },\n        {\n            \"id\": 2,\n            \"slug\": \"fashion\",\n            \"name\": \"Fashion\",\n            \"created_at\": \"2026-11-19T08:35:25.000000Z\",\n            \"updated_at\": \"2026-11-19T08:35:25.000000Z\"\n        },\n        {\n            \"id\": 3,\n            \"slug\": \"food-beverages\",\n            \"name\": \"Food & Beverages\",\n            \"created_at\": \"2026-11-19T08:35:25.000000Z\",\n            \"updated_at\": \"2026-11-19T08:35:25.000000Z\"\n        },\n        {\n            \"id\": 4,\n            \"slug\": \"home-living\",\n            \"name\": \"Home & Living\",\n            \"created_at\": \"2026-11-19T08:35:25.000000Z\",\n            \"updated_at\": \"2026-11-19T08:35:25.000000Z\"\n        }\n    ],\n    \"meta\": null\n}"
+            },
+            {
+              "name": "404 - Invalid Endpoint",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/categories=1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "categories=1"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 15:49:45 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Data atau endpoint tidak ditemukan.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Daftar Produk",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products?page=1&limit=10&q=wireless&category=electronics&sort=termurah",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "q",
+                  "value": "wireless"
+                },
+                {
+                  "key": "category",
+                  "value": "electronics"
+                },
+                {
+                  "key": "sort",
+                  "value": "termurah"
+                }
+              ]
+            },
+            "description": "Mengambil daftar produk dengan dukungan filter, pencarian, dan pengurutan"
+          },
+          "response": [
+            {
+              "name": "200 - Products List",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/products?page=1&limit=10&q=wireless&category=electronics&sort=price_asc",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "products"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "q",
+                      "value": "wireless"
+                    },
+                    {
+                      "key": "category",
+                      "value": "electronics"
+                    },
+                    {
+                      "key": "sort",
+                      "value": "price_asc"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 11:16:34 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Daftar produk berhasil diambil\",\n    \"data\": [\n        {\n            \"id\": 4,\n            \"category_id\": 1,\n            \"title\": \"Ergonomic Wireless Mouse\",\n            \"description\": \"Precision wireless mouse designed for all-day comfort with silent clicks and dual Bluetooth mode.\",\n            \"price\": \"299000.00\",\n            \"stock\": 60,\n            \"image_url\": \"https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=600\",\n            \"created_at\": \"2026-11-19T08:35:25.000000Z\",\n            \"updated_at\": \"2026-11-19T08:35:25.000000Z\",\n            \"category\": {\n                \"id\": 1,\n                \"slug\": \"electronics\",\n                \"name\": \"Electronics\"\n            }\n        },\n        {\n            \"id\": 1,\n            \"category_id\": 1,\n            \"title\": \"Wireless Noise-Canceling Headphones\",\n            \"description\": \"Over-ear Bluetooth headphones with active noise cancellation and 30-hour battery life.\",\n            \"price\": \"1499000.00\",\n            \"stock\": 23,\n            \"image_url\": \"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600\",\n            \"created_at\": \"2026-11-19T08:35:25.000000Z\",\n            \"updated_at\": \"2026-11-19T10:53:51.000000Z\",\n            \"category\": {\n                \"id\": 1,\n                \"slug\": \"electronics\",\n                \"name\": \"Electronics\"\n            }\n        }\n    ],\n    \"meta\": {\n        \"page\": 1,\n        \"limit\": 10,\n        \"total\": 2,\n        \"total_pages\": 1\n    }\n}"
+            },
+            {
+              "name": "422 - Invalid Sort",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/products?page=1&limit=10&q=wireless&category=electronics&sort=termurah",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "products"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "q",
+                      "value": "wireless"
+                    },
+                    {
+                      "key": "category",
+                      "value": "electronics"
+                    },
+                    {
+                      "key": "sort",
+                      "value": "termurah"
+                    }
+                  ]
+                }
+              },
+              "status": "Unprocessable Content",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 15:51:29 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Validation failed\",\n  \"errors\": {\n    \"sort\": [\n      \"Pilihan sort tidak valid. Gunakan: price_asc, price_desc, atau newest.\"\n    ]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Detail Produk",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/{{product_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "{{product_id}}"
+              ]
+            },
+            "description": "Mengambil detail lengkap dari satu produk berdasarkan ID produk"
+          },
+          "response": [
+            {
+              "name": "200 - Detail Product",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/products/{{product_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "products",
+                    "{{product_id}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 15:51:55 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Detail produk berhasil diambil\",\n  \"data\": {\n    \"id\": 1,\n    \"category_id\": 1,\n    \"title\": \"Wireless Noise-Canceling Headphones\",\n    \"description\": \"Over-ear Bluetooth headphones with active noise cancellation and 30-hour battery life.\",\n    \"price\": \"1499000.00\",\n    \"stock\": 23,\n    \"image_url\": \"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600\",\n    \"created_at\": \"2026-11-19T08:35:25.000000Z\",\n    \"updated_at\": \"2026-11-19T10:53:51.000000Z\",\n    \"category\": {\n      \"id\": 1,\n      \"slug\": \"electronics\",\n      \"name\": \"Electronics\"\n    }\n  },\n  \"meta\": null\n}"
+            },
+            {
+              "name": "404 - Product Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/products/666",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "products",
+                    "666"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 09:07:28 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": false,\n    \"message\": \"Produk tidak ditemukan\"\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Menyediakan endpoint untuk menjelajahi katalog produk toko. Mencakup pengambilan daftar kategori produk, daftar semua produk beserta opsi pengurutan, serta informasi detail untuk produk tertentu"
+    },
+    {
+      "name": "Cart",
+      "item": [
+        {
+          "name": "Isi Keranjang",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cart",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cart"
+              ]
+            },
+            "description": "Mengambil daftar semua item yang ada di keranjang belanja pengguna"
+          },
+          "response": [
+            {
+              "name": "200 - Cart Item List",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/cart",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "cart"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 09:26:51 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Isi keranjang belanja berhasil diambil\",\n    \"data\": {\n        \"items\": [],\n        \"total_price\": \"0.00\"\n    },\n    \"meta\": null\n}"
+            },
+            {
+              "name": "401 - Invalid Credentials",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/cart",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "cart"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 15:53:38 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Unauthenticated. Token tidak valid atau tidak disertakan.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Tambah Produk ke Keranjang",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"product_id\": 1,\r\n    \"quantity\": 2\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/cart/items",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cart",
+                "items"
+              ]
+            },
+            "description": "Menambahkan produk ke dalam keranjang belanja pengguna"
+          },
+          "response": [
+            {
+              "name": "201 - Cart Item Added",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"product_id\": 1,\r\n    \"quantity\": 2\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/cart/items",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "cart",
+                    "items"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 09:30:17 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Produk berhasil ditambahkan ke keranjang\",\n    \"data\": {\n        \"user_id\": 2,\n        \"product_id\": 1,\n        \"quantity\": 2,\n        \"updated_at\": \"2026-11-19T09:30:17.000000Z\",\n        \"created_at\": \"2026-11-19T09:30:17.000000Z\",\n        \"id\": 1\n    },\n    \"meta\": null\n}"
+            },
+            {
+              "name": "422 - Invalid Body",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/cart/items",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "cart",
+                    "items"
+                  ]
+                }
+              },
+              "status": "Unprocessable Content",
+              "code": 422,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 09:31:02 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": false,\n    \"message\": \"Validation failed\",\n    \"errors\": {\n        \"product_id\": [\n            \"ID produk wajib diisi.\"\n        ],\n        \"quantity\": [\n            \"Quantity wajib diisi.\"\n        ]\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Mengubah Quantity",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"quantity\": 666\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/cart/items/{{cart_item_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cart",
+                "items",
+                "{{cart_item_id}}"
+              ]
+            },
+            "description": "Mengubah jumlah quantity item tertentu yang ada di keranjang belanja pengguna"
+          },
+          "response": [
+            {
+              "name": "200 - Quantity Updated",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"quantity\": 2\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/cart/items/{{cart_item_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "cart",
+                    "items",
+                    "{{cart_item_id}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 16:02:09 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Jumlah item keranjang berhasil diperbarui\",\n  \"data\": {\n    \"id\": 3,\n    \"user_id\": 2,\n    \"product_id\": 1,\n    \"quantity\": 2,\n    \"created_at\": \"2026-11-19T10:49:16.000000Z\",\n    \"updated_at\": \"2026-11-19T16:01:45.000000Z\",\n    \"product\": {\n      \"id\": 1,\n      \"category_id\": 1,\n      \"title\": \"Wireless Noise-Canceling Headphones\",\n      \"description\": \"Over-ear Bluetooth headphones with active noise cancellation and 30-hour battery life.\",\n      \"price\": \"1499000.00\",\n      \"stock\": 23,\n      \"image_url\": \"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600\",\n      \"created_at\": \"2026-11-19T08:35:25.000000Z\",\n      \"updated_at\": \"2026-11-19T10:53:51.000000Z\"\n    }\n  },\n  \"meta\": null\n}"
+            },
+            {
+              "name": "422 - Quantity 0",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"quantity\": 0\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/cart/items/{{cart_item_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "cart",
+                    "items",
+                    "{{cart_item_id}}"
+                  ]
+                }
+              },
+              "status": "Unprocessable Content",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 16:02:55 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Validation failed\",\n  \"errors\": {\n    \"quantity\": [\n      \"Quantity minimal 1.\"\n    ]\n  }\n}"
+            },
+            {
+              "name": "409 - Insufficient Stock",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"quantity\": 666\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/cart/items/{{cart_item_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "cart",
+                    "items",
+                    "{{cart_item_id}}"
+                  ]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 16:03:17 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Stok produk 'Wireless Noise-Canceling Headphones' tidak mencukupi.\",\n  \"errors\": {\n    \"product_id\": 1,\n    \"title\": \"Wireless Noise-Canceling Headphones\",\n    \"available_stock\": 23,\n    \"requested_quantity\": 666\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Menghapus Item Keranjang",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/cart/items/{{cart_item_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cart",
+                "items",
+                "{{cart_item_id}}"
+              ]
+            },
+            "description": "Menghapus item tertentu dari keranjang belanja pengguna berdasarkan ID item"
+          },
+          "response": [
+            {
+              "name": "200 - Cart Item Deleted",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/cart/items/{{cart_item_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "cart",
+                    "items",
+                    "{{cart_item_id}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 16:05:05 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Item keranjang berhasil dihapus\",\n  \"data\": null,\n  \"meta\": null\n}"
+            },
+            {
+              "name": "404 - Cart Item Not Found",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/cart/items/1",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "cart",
+                    "items",
+                    "1"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 16:04:41 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Item keranjang tidak ditemukan\"\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Mengelola siklus keranjang belanja untuk pengguna yang telah terautentikasi. Mencakup melihat isi keranjang, menambahkan produk, memperbarui jumlah item dengan validasi stok, serta menghapus item dari keranjang"
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Checkout",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "Memproses checkout keranjang belanja pengguna menjadi sebuah order baru"
+          },
+          "response": [
+            {
+              "name": "201 - Checkout Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/orders",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "orders"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 10:35:26 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Checkout berhasil, order berhasil dibuat\",\n    \"data\": {\n        \"user_id\": 2,\n        \"total_price\": \"2998000.00\",\n        \"status\": \"pending\",\n        \"updated_at\": \"2026-11-19T10:35:26.000000Z\",\n        \"created_at\": \"2026-11-19T10:35:26.000000Z\",\n        \"id\": 1,\n        \"order_items\": [\n            {\n                \"id\": 1,\n                \"order_id\": 1,\n                \"product_id\": 1,\n                \"quantity\": 2,\n                \"price\": \"1499000.00\",\n                \"created_at\": \"2026-11-19T10:35:26.000000Z\",\n                \"updated_at\": \"2026-11-19T10:35:26.000000Z\",\n                \"product\": {\n                    \"id\": 1,\n                    \"title\": \"Wireless Noise-Canceling Headphones\",\n                    \"image_url\": \"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600\"\n                }\n            }\n        ]\n    },\n    \"meta\": null\n}"
+            },
+            {
+              "name": "400 - Insufficient Cart",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/orders",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "orders"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 16:05:41 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Keranjang belanja kosong. Tidak dapat melakukan checkout.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Riwayat Order",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "Mengambil daftar riwayat order yang pernah dilakukan oleh pengguna"
+          },
+          "response": [
+            {
+              "name": "200 - History Orders",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/orders",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "orders"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 10:39:11 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Riwayat pesanan berhasil diambil\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"user_id\": 2,\n            \"total_price\": \"2998000.00\",\n            \"status\": \"pending\",\n            \"created_at\": \"2026-11-19T10:35:26.000000Z\",\n            \"updated_at\": \"2026-11-19T10:35:26.000000Z\",\n            \"order_items\": [\n                {\n                    \"id\": 1,\n                    \"order_id\": 1,\n                    \"product_id\": 1,\n                    \"quantity\": 2,\n                    \"price\": \"1499000.00\",\n                    \"created_at\": \"2026-11-19T10:35:26.000000Z\",\n                    \"updated_at\": \"2026-11-19T10:35:26.000000Z\",\n                    \"product\": {\n                        \"id\": 1,\n                        \"title\": \"Wireless Noise-Canceling Headphones\",\n                        \"image_url\": \"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600\"\n                    }\n                }\n            ]\n        }\n    ],\n    \"meta\": null\n}"
+            },
+            {
+              "name": "401 - Invalid Credentials",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/orders",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "orders"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 16:08:02 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Unauthenticated. Token tidak valid atau tidak disertakan.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Detail Order",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/orders/666",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "666"
+              ]
+            },
+            "description": "Mengambil detail lengkap dari satu order berdasarkan ID order"
+          },
+          "response": [
+            {
+              "name": "200 - Detail Orders",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/orders/{{order_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "orders",
+                    "{{order_id}}"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 16:08:34 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": true,\n  \"message\": \"Detail pesanan berhasil diambil\",\n  \"data\": {\n    \"id\": 1,\n    \"user_id\": 2,\n    \"total_price\": \"2998000.00\",\n    \"status\": \"pending\",\n    \"created_at\": \"2026-11-19T10:35:26.000000Z\",\n    \"updated_at\": \"2026-11-19T10:35:26.000000Z\",\n    \"order_items\": [\n      {\n        \"id\": 1,\n        \"order_id\": 1,\n        \"product_id\": 1,\n        \"quantity\": 2,\n        \"price\": \"1499000.00\",\n        \"created_at\": \"2026-11-19T10:35:26.000000Z\",\n        \"updated_at\": \"2026-11-19T10:35:26.000000Z\",\n        \"product\": {\n          \"id\": 1,\n          \"title\": \"Wireless Noise-Canceling Headphones\",\n          \"image_url\": \"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600\"\n        }\n      }\n    ]\n  },\n  \"meta\": null\n}"
+            },
+            {
+              "name": "404 - Order Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/orders/666",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "orders",
+                    "666"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Host",
+                  "value": "127.0.0.1:8000"
+                },
+                {
+                  "key": "Connection",
+                  "value": "close"
+                },
+                {
+                  "key": "X-Powered-By",
+                  "value": "PHP/8.5.6"
+                },
+                {
+                  "key": "Cache-Control",
+                  "value": "no-cache, private"
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 19 Nov 2026 16:08:53 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"success\": false,\n  \"message\": \"Pesanan tidak ditemukan\"\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Menangani proses manajemen pesanan untuk pengguna yang telah terautentikasi. Mencakup proses checkout untuk membuat pesanan baru, melihat riwayat seluruh pesanan, serta mengambil detail dari pesanan tertentu"
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "GET Admin Products",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/products?page=1&limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Mendapatkan seluruh daftar produk untuk administrator (termasuk produk aktif dan nonaktif)"
+          },
+          "response": [
+            {
+              "name": "200 - List Admin Products",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": ""
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Daftar produk admin berhasil diambil\",\n    \"data\": [\n        {\n            \"id\": 1,\n            \"category_id\": 1,\n            \"title\": \"Wireless Headphones\",\n            \"description\": \"ANC bluetooth headset\",\n            \"price\": \"1499000.00\",\n            \"stock\": 25,\n            \"image_url\": \"https:\\/\\/example.com\\/item.jpg\",\n            \"is_active\": true,\n            \"category\": {\n                \"id\": 1,\n                \"slug\": \"electronics\",\n                \"name\": \"Electronics\"\n            }\n        }\n    ],\n    \"meta\": {\n        \"page\": 1,\n        \"limit\": 10,\n        \"total\": 35,\n        \"total_pages\": 4\n    }\n}"
+            },
+            {
+              "name": "401 - Unauthenticated",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": ""
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"success\": false,\n    \"message\": \"Unauthenticated. Token tidak valid atau tidak disertakan.\"\n}"
+            },
+            {
+              "name": "403 - Forbidden (Customer Role)",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": ""
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"success\": false,\n    \"message\": \"Akses ditolak. Endpoint ini hanya dapat diakses oleh Administrator.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "POST Admin Product",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"category_id\": 1,\n    \"title\": \"Gaming Mouse Wireless Pro\",\n    \"description\": \"Lightweight RGB sensor 26000 DPI\",\n    \"price\": 750000,\n    \"stock\": 40,\n    \"image_url\": \"https:\\/\\/images.unsplash.com\\/photo-1527864550417-7fd91fc51a46?w=600\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "products"
+              ]
+            },
+            "description": "Menambahkan produk baru oleh administrator"
+          },
+          "response": [
+            {
+              "name": "201 - Created",
+              "originalRequest": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{admin_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"category_id\": 1,\n    \"title\": \"Gaming Mouse Wireless Pro\",\n    \"description\": \"Lightweight RGB sensor 26000 DPI\",\n    \"price\": 750000,\n    \"stock\": 40,\n    \"image_url\": \"https:\\/\\/images.unsplash.com\\/photo-1527864550417-7fd91fc51a46?w=600\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/admin/products",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "products"
+                  ]
+                },
+                "description": "Menambahkan produk baru oleh administrator"
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Produk berhasil dibuat.\",\n    \"data\": {\n        \"id\": 36,\n        \"category_id\": 1,\n        \"title\": \"Gaming Mouse Wireless Pro\",\n        \"description\": \"Lightweight RGB sensor 26000 DPI\",\n        \"price\": \"750000.00\",\n        \"stock\": 40,\n        \"image_url\": \"https:\\/\\/images.unsplash.com\\/photo-1527864550417-7fd91fc51a46?w=600\",\n        \"is_active\": true\n    },\n    \"meta\": null\n}"
+            },
+            {
+              "name": "422 - Validation Failed",
+              "originalRequest": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{admin_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"category_id\": 1,\n    \"title\": \"Gaming Mouse Wireless Pro\",\n    \"description\": \"Lightweight RGB sensor 26000 DPI\",\n    \"price\": 750000,\n    \"stock\": 40,\n    \"image_url\": \"https:\\/\\/images.unsplash.com\\/photo-1527864550417-7fd91fc51a46?w=600\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/admin/products",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "products"
+                  ]
+                },
+                "description": "Menambahkan produk baru oleh administrator"
+              },
+              "status": "Unprocessable Content",
+              "code": 422,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"success\": false,\n    \"message\": \"Validation failed\",\n    \"errors\": {\n        \"title\": [\n            \"Judul produk wajib diisi.\"\n        ],\n        \"price\": [\n            \"Harga produk wajib diisi.\"\n        ]\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "GET Admin Product Detail",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/products/{{product_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "products",
+                "{{product_id}}"
+              ]
+            },
+            "description": "Melihat detail produk spesifik oleh administrator"
+          },
+          "response": [
+            {
+              "name": "200 - Product Detail",
+              "originalRequest": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{admin_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/admin/products/{{product_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "products",
+                    "{{product_id}}"
+                  ]
+                },
+                "description": "Melihat detail produk spesifik oleh administrator"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Detail produk berhasil diambil.\",\n    \"data\": {\n        \"id\": 1,\n        \"category_id\": 1,\n        \"title\": \"Wireless Headphones\",\n        \"price\": \"1499000.00\",\n        \"stock\": 25,\n        \"is_active\": true\n    },\n    \"meta\": null\n}"
+            },
+            {
+              "name": "404 - Product Not Found",
+              "originalRequest": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{admin_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/admin/products/{{product_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "products",
+                    "{{product_id}}"
+                  ]
+                },
+                "description": "Melihat detail produk spesifik oleh administrator"
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"success\": false,\n    \"message\": \"Produk tidak ditemukan.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "PUT Admin Product",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"category_id\": 1,\n    \"title\": \"Wireless Noise-Canceling Headphones v2\",\n    \"description\": \"Updated battery life 40 hours\",\n    \"price\": 1650000,\n    \"stock\": 50,\n    \"image_url\": \"https:\\/\\/images.unsplash.com\\/photo-1505740420928-5e560c06d30e?w=600\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/products/{{product_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "products",
+                "{{product_id}}"
+              ]
+            },
+            "description": "Memperbarui seluruh data produk oleh administrator"
+          },
+          "response": [
+            {
+              "name": "200 - Updated",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": ""
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Produk berhasil diperbarui.\",\n    \"data\": {\n        \"id\": 1,\n        \"title\": \"Wireless Noise-Canceling Headphones v2\",\n        \"price\": \"1650000.00\",\n        \"stock\": 50,\n        \"is_active\": true\n    },\n    \"meta\": null\n}"
+            }
+          ]
+        },
+        {
+          "name": "PATCH Admin Product",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"stock\": 75\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/admin/products/{{product_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "products",
+                "{{product_id}}"
+              ]
+            },
+            "description": "Memperbarui sebagian atribut produk (misal stok saja)"
+          },
+          "response": [
+            {
+              "name": "200 - Patched",
+              "originalRequest": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{admin_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"stock\": 75\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/admin/products/{{product_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "products",
+                    "{{product_id}}"
+                  ]
+                },
+                "description": "Memperbarui sebagian atribut produk (misal stok saja)"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Produk berhasil diperbarui.\",\n    \"data\": {\n        \"id\": 1,\n        \"stock\": 75\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "DELETE Admin Product",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/products/{{product_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "products",
+                "{{product_id}}"
+              ]
+            },
+            "description": "Menonaktifkan produk secara aman (soft deactivation is_active=false) agar riwayat order masa lalu tetap terjaga"
+          },
+          "response": [
+            {
+              "name": "200 - Deactivated",
+              "originalRequest": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{admin_token}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/admin/products/{{product_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "products",
+                    "{{product_id}}"
+                  ]
+                },
+                "description": "Menonaktifkan produk secara aman (soft deactivation is_active=false) agar riwayat order masa lalu tetap terjaga"
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "cookie": [],
+              "body": "{\n    \"success\": true,\n    \"message\": \"Produk berhasil dinonaktifkan.\",\n    \"data\": {\n        \"id\": 1,\n        \"title\": \"Wireless Headphones\",\n        \"is_active\": false\n    },\n    \"meta\": null\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Mengelola seluruh proses manajemen produk khusus Admin, mencakup penambahan, penampilan, pembaruan, dan penonaktifan produk"
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/health",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "health"
+          ]
+        },
+        "description": "Mengecek ketersediaan server dan koneksi database MySQL secara publik"
+      },
+      "response": [
+        {
+          "name": "200 - Healthy",
+          "originalRequest": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": ""
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [],
+          "cookie": [],
+          "body": "{\n    \"success\": true,\n    \"message\": \"Aplikasi berjalan normal.\",\n    \"data\": {\n        \"status\": \"healthy\",\n        \"timestamp\": \"2026-11-20T00:00:00+07:00\",\n        \"services\": {\n            \"database\": \"ok\"\n        }\n    },\n    \"meta\": null\n}"
+        }
+      ]
+    }
+  ]
+}

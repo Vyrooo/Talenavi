@@ -1,5 +1,5 @@
-# Gunakan PHP 8.3 FPM Alpine yang ringan dan aman
-FROM php:8.3-fpm-alpine
+# Gunakan PHP 8.5 FPM Alpine yang ringan dan aman
+FROM php:8.5-fpm-alpine
 
 # Set working directory
 WORKDIR /var/www/html
@@ -19,7 +19,8 @@ RUN apk update && apk add --no-cache \
     netcat-openbsd
 
 # Install ekstensi PHP yang dibutuhkan Laravel
-RUN docker-php-ext-install \
+
+RUN docker-php-ext-install -j2 \
     pdo_mysql \
     mbstring \
     exif \
@@ -27,8 +28,8 @@ RUN docker-php-ext-install \
     bcmath \
     gd \
     zip \
-    intl \
-    opcache
+    intl
+
 
 # Salin binary Composer dari official image
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
