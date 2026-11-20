@@ -42,7 +42,7 @@ SANCTUM_EXPIRATION=1440
 
 ADMIN_NAME="Production Administrator"
 ADMIN_EMAIL="admin@yourdomain.com"
-ADMIN_PASSWORD=YourStrongAdminPassword123!
+ADMIN_PASSWORD=your_production_admin_password
 ```
 
 ---

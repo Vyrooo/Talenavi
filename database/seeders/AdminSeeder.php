@@ -14,8 +14,13 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
         $adminName = env('ADMIN_NAME', 'Store Administrator');
-        $adminEmail = env('ADMIN_EMAIL', 'admin@gmail.com');
-        $adminPassword = env('ADMIN_PASSWORD', 'admin123');
+        $adminEmail = env('ADMIN_EMAIL');
+        $adminPassword = env('ADMIN_PASSWORD');
+
+        if (! $adminEmail || ! $adminPassword) {
+            $this->command?->warn('ADMIN_EMAIL atau ADMIN_PASSWORD belum diatur di file .env. AdminSeeder dilewati demi keamanan kredensial.');
+            return;
+        }
 
         $existingAdmin = User::where('email', $adminEmail)->first();
 
@@ -27,7 +32,7 @@ class AdminSeeder extends Seeder
                 'role' => 'admin',
             ]);
         } else {
-            // Perbarui data admin dan pastikan memiliki role admin serta password terbaru
+            // Perbarui data admin dan pastikan memiliki role admin serta password terbaru dari .env
             $existingAdmin->update([
                 'name' => $adminName,
                 'password' => Hash::make($adminPassword),

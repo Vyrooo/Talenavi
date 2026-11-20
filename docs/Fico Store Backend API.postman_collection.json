@@ -426,7 +426,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"email\": \"admin@gmail.com\",\n    \"password\": \"admin123\"\n}",
+                            "raw": "{\n    \"email\": \"admin@gmail.com\",\n    \"password\": \"{{admin_password}}\"\n}",
                             "options": {
                                 "raw": {
                                     "language": "json"
@@ -444,7 +444,7 @@
                                 "login"
                             ]
                         },
-                        "description": "Login sebagai Administrator (admin@gmail.com / admin123). Token yang didapat akan otomatis disimpan ke variabel {{admin_token}}."
+                        "description": "Login sebagai Administrator (admin@gmail.com). Password mengambil dari variabel environment {{admin_password}}. Token yang didapat akan otomatis disimpan ke variabel {{admin_token}}."
                     },
                     "response": [
                         {
