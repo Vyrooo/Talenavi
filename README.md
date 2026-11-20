@@ -25,7 +25,7 @@ Aplikasi ini merupakan backend RESTful API lengkap untuk mendukung operasional t
 - **Bahasa Pemrograman**: PHP `^8.2` (Diuji dan kompatibel penuh pada PHP 8.2, PHP 8.3, dan PHP 8.5)
 - **Database**: MySQL `8.0+` / MariaDB `10.4+` (Engine InnoDB dengan dukungan transaksi ACID dan *row-level locking*)
 - **Autentikasi**: [Laravel Sanctum](https://laravel.com/docs/sanctum) (Bearer Token dengan masa berlaku dinamis)
-- **Containerization**: Docker & Docker Compose (PHP 8.3 FPM, Nginx Alpine, MySQL 8.0)
+- **Containerization**: Docker & Docker Compose (PHP-FPM, Nginx Alpine, MySQL 8.0, phpMyAdmin)
 - **Testing Framework**: PHPUnit (38 automated tests mencakup Unit, Feature, Security, dan Concurrency)
 - **Arsitektur API**: Service-Layered RESTful API (Controller $\rightarrow$ Service $\rightarrow$ Eloquent Model)
 - **Dokumentasi & Pengujian API**: [Postman](https://www.postman.com/) (Collection v2.1 dan Environment)
@@ -226,7 +226,11 @@ Aplikasi siap diakses pada: **`http://127.0.0.1:8000`**
 
 ## 8. Menjalankan Aplikasi Menggunakan Docker (Docker Setup)
 
-Aplikasi telah dilengkapi konfigurasi Docker multi-container (PHP-FPM 8.3, Nginx Web Server, dan MySQL 8.0).
+Aplikasi telah dilengkapi konfigurasi Docker multi-container berbasis `docker-compose.yml`:
+1. **`app`**: Service Laravel berbasis PHP-FPM (`php:8.5-fpm-alpine` / PHP 8.3+) dengan ekstensi `pdo_mysql`, `mbstring`, `bcmath`, `gd`, `zip`, dan `intl`.
+2. **`web`**: Nginx Web Server (`nginx:alpine`) sebagai HTTP reverse proxy ke PHP-FPM (Port `8000`).
+3. **`db`**: MySQL Database (`mysql:8.0`) dengan persistent volume `db_data` dan healthcheck otomatis (Port `3307` pada host -> `3306` container).
+4. **`phpmyadmin`**: Database management web GUI (`phpmyadmin:latest`) terhubung langsung ke service database (Port `8080`).
 
 ### Langkah Menjalankan Docker:
 ```bash
@@ -236,8 +240,9 @@ docker compose up -d --build
 # 2. Jalankan migration dan seeder di dalam container app:
 docker compose exec app php artisan migrate --seed
 
-# 3. Aplikasi dapat langsung diakses melalui browser atau Postman di:
-# http://localhost:8000
+# 3. Akses aplikasi:
+# - API Web Server: http://localhost:8000
+# - phpMyAdmin GUI: http://localhost:8080 (Server: db, User: root, Password: sesuai DB_PASSWORD di .env / default: root)
 ```
 
 ### Manajemen Docker:
@@ -252,7 +257,7 @@ docker compose logs -f app
 docker compose exec app sh
 ```
 
-*(Catatan: Jika port 8000 sudah digunakan di komputer Anda, ubah variabel `APP_PORT=8080` pada file `.env`)*.
+*(Catatan: Port web publik dapat dikonfigurasi melalui variabel `APP_PORT` dan port database via `FORWARD_DB_PORT` pada file `.env`)*.
 
 ---
 
@@ -262,32 +267,33 @@ Aplikasi memiliki **38 automated tests** dengan **147 assertions** yang berjalan
 
 ### Cara Menjalankan Test:
 ```bash
-# Menjalankan seluruh test suite
-php artisan test
+# Menjalankan seluruh test suite via PHPUnit:
+vendor/bin/phpunit
 
-# Menjalankan test spesifik berdasarkan kelompok fitur
-php artisan test --filter=AuthenticationTest
-php artisan test --filter=ProductTest
-php artisan test --filter=CartTest
-php artisan test --filter=OrderTest
-php artisan test --filter=AdminProductTest
-php artisan test --filter=SecurityTest
+# Di Windows PowerShell:
+.\vendor\bin\phpunit
+
+# Menjalankan test spesifik berdasarkan kelompok fitur:
+vendor/bin/phpunit --filter AuthenticationTest
+vendor/bin/phpunit --filter ProductTest
+vendor/bin/phpunit --filter CartTest
+vendor/bin/phpunit --filter OrderTest
+vendor/bin/phpunit --filter AdminProductTest
+vendor/bin/phpunit --filter SecurityTest
 ```
 
 ### Hasil Uji Aktual (Actual Test Results):
 ```text
-   PASS  Tests\Unit\ExampleTest
-   PASS  Tests\Unit\Services\OrderServiceTest
-   PASS  Tests\Feature\Api\AdminProductTest (6 tests)
-   PASS  Tests\Feature\Api\AuthenticationTest (7 tests)
-   PASS  Tests\Feature\Api\CartTest (6 tests)
-   PASS  Tests\Feature\Api\OrderTest (5 tests)
-   PASS  Tests\Feature\Api\ProductTest (8 tests)
-   PASS  Tests\Feature\Api\SecurityTest (3 tests)
-   PASS  Tests\Feature\ExampleTest
+PHPUnit 11.5.58 by Sebastian Bergmann and contributors.
 
-   Tests:    38 passed (147 assertions)
-   Duration: 1.45s
+Runtime:       PHP 8.5.6 (kompatibel PHP 8.2 - 8.5)
+Configuration: D:\coding\Talenavi\phpunit.xml
+
+......................................                            38 / 38 (100%)
+
+Time: 00:01.334, Memory: 50.00 MB
+
+OK (38 tests, 147 assertions)
 ```
 
 ---
@@ -380,13 +386,23 @@ File Postman Collection dan Environment telah diperbarui dengan modul Admin dan 
 
 ## 13. Penanganan Concurrent Checkout & Row Locking
 
-Ketika beberapa pengguna melakukan checkout bersamaan untuk produk dengan stok terbatas, sistem mencegah *race condition* dan *overselling* melalui:
+Ketika beberapa pengguna melakukan checkout bersamaan untuk produk dengan stok terbatas, sistem mencegah *race condition*, *overselling*, dan *deadlock* melalui:
 1. **`DB::transaction()`**: Menjalankan seluruh proses checkout dalam satu unit kerja atomik.
-2. **`lockForUpdate()` (Pessimistic Locking)**: Membaca baris produk dengan perintah SQL `SELECT ... FOR UPDATE` pada MySQL InnoDB.
-3. **Pencegahan Deadlock**: Mengurutkan ID produk secara ascending (`orderBy('id', 'asc')`) sebelum dikunci sehingga urutan penguncian selalu deterministik.
-4. **Validasi Stok & Status Aktif**: Jika stok kurang atau produk nonaktif, checkout digagalkan (HTTP 409 Conflict) dan transaksi di-rollback secara utuh tanpa ada order parsial.
+2. **`lockForUpdate()` (Pessimistic Locking)**: Membaca baris produk dengan klausa SQL `SELECT ... FOR UPDATE` pada MySQL InnoDB. Transaksi pertama yang membaca baris produk langsung memegang lock eksklusif. Transaksi kedua yang mencoba membaca baris yang sama akan dipaksa mengantre sampai transaksi pertama selesai (`COMMIT` atau `ROLLBACK`).
+3. **Pencegahan Deadlock (Deterministic Locking Order)**: Mengurutkan ID produk secara menaik (`Product::whereIn('id', $productIds)->orderBy('id', 'asc')->lockForUpdate()`) sebelum dikunci, sehingga seluruh transaksi selalu mengunci baris produk dengan urutan yang sama dan mengeliminasi risiko saling tunggu.
+4. **Validasi Stok & Status Aktif di Dalam Lock**: Jika stok kurang dari permintaan atau produk dinonaktifkan, checkout dibatalkan dengan melempar `InsufficientStockException` (`HTTP 409 Conflict`) dan seluruh transaksi di-rollback tanpa ada pesanan parsial.
 
-> Untuk instruksi pengujian paralel menggunakan dua koneksi MySQL independen, silakan baca dokumentasi khusus di [`docs/concurrency-testing.md`](file:///d:/coding/Talenavi/docs/concurrency-testing.md).
+> **Catatan Teknis SQLite vs MySQL**: Automated unit test Laravel menggunakan database SQLite in-memory untuk kecepatan dan isolasi. Karena SQLite hanya mendukung file-level lock dan mengabaikan row lock `SELECT ... FOR UPDATE`, verifikasi concurrency locking yang sesungguhnya terjadi pada database **MySQL InnoDB**.
+
+### Prosedur Pengujian Concurrency pada MySQL:
+- **Skenario Uji**: Produk ID `1` memiliki **stok = 5**. Dua user melakukan checkout pada saat yang sama:
+  - **User A**: Membeli kuantitas **4**.
+  - **User B**: Membeli kuantitas **3**.
+- **Hasil yang Dijamin Sistem**:
+  - Tepat **1 user** berhasil (`HTTP 201 Created`).
+  - **1 user lainnya** ditolak dengan pesan stok tidak mencukupi (`HTTP 409 Conflict`).
+  - Sisa stok akhir di database: `5 - 4 = 1` (atau `5 - 3 = 2`), **tidak pernah bernilai negatif (*overselling*)**.
+  - Keranjang belanja user yang gagal tetap utuh dan tidak ada order parsial yang terbuat.
 
 ---
 
@@ -432,10 +448,54 @@ Format JSON response telah distandarisasi di seluruh endpoint menggunakan helper
 
 ## 16. Kesiapan Deployment (Deployment Readiness)
 
-Aplikasi telah memenuhi kriteria *production deployment*. Panduan penyiapan production, konfigurasi HTTPS, backup database, dan deployment ke Railway, Render, Fly.io, maupun VPS Ubuntu dapat dibaca secara lengkap pada:
-👉 [`docs/deployment.md`](file:///d:/coding/Talenavi/docs/deployment.md).
+Aplikasi telah dirancang dan dioptimalkan untuk standar *production-ready deployment*.
 
-*(Catatan: Deployment aktual ke platform cloud publik memerlukan konfigurasi akun hosting dan secret environment production dari pengguna)*.
+### Checklist Kesiapan Produksi:
+- [x] **`APP_DEBUG=false`**: Mencegah kebocoran stack trace error ke pengguna publik.
+- [x] **`APP_KEY` Unik**: Digenerate khusus untuk enkripsi sesi dan token.
+- [x] **Database Transaksional (InnoDB)**: Menjamin integritas ACID dan *row-level locking*.
+- [x] **HTTPS/SSL Wajib**: Semua komunikasi API harus melalui TLS/SSL.
+- [x] **Kredensial via Environment**: Kredensial database dan secret token diatur via Environment Variables hosting, bukan di dalam source code repository.
+- [x] **Izin Akses Direktori**: Direktori `storage/` dan `bootstrap/cache/` memiliki izin tulis (`chmod -R 775 storage bootstrap/cache`).
+
+### Panduan Deployment Platform:
+1. **Platform PaaS (Railway / Render / Fly.io)**:
+   - Hubungkan repository GitHub dan buat service database MySQL.
+   - Atur environment variables production (`APP_ENV=production`, `APP_DEBUG=false`, `DB_*`, `ADMIN_*`).
+   - Gunakan start command:
+     ```bash
+     php artisan migrate --force && php-fpm
+     ```
+     *(Flag `--force` wajib disertakan pada environment production).*
+2. **VPS (Ubuntu 22.04 / 24.04 LTS)**:
+   - Jalankan multi-container via `docker compose up -d --build`.
+   - Jalankan optimasi Laravel:
+     ```bash
+     docker compose exec app php artisan config:cache
+     docker compose exec app php artisan route:cache
+     docker compose exec app php artisan migrate --force
+     ```
+   - Gunakan Nginx reverse proxy pada host dengan sertifikat SSL gratis via Certbot Let's Encrypt:
+     ```bash
+     sudo certbot --nginx -d api.yourdomain.com
+     ```
+
+### Prosedur Backup & Restore Database MySQL:
+```bash
+# Backup database ke file dump SQL:
+docker compose exec db mysqldump -u root -p<DB_PASSWORD> fico_store > backup_$(date +%F).sql
+
+# Restore database dari file backup:
+docker compose exec -T db mysql -u root -p<DB_PASSWORD> fico_store < backup_file.sql
+```
+
+### Tabel Troubleshooting Deployment:
+| Gejala Masalah | Penyebab Umum | Solusi |
+|---|---|---|
+| **Error 500 saat dibuka** | `APP_KEY` kosong atau permission `storage/` terkunci | Jalankan `php artisan key:generate` dan `chmod -R 775 storage bootstrap/cache`. |
+| **Database Connection Refused** | Container web/app menyala sebelum MySQL siap atau host salah | Gunakan host `db` di Docker network dan pastikan container database dalam kondisi `healthy`. |
+| **Migration Dibatalkan** | Laravel mendeteksi `APP_ENV=production` | Tambahkan flag `--force`: `php artisan migrate --force`. |
+| **Perubahan Route / Config Tidak Muncul** | Cache konfigurasi lama masih aktif | Jalankan `php artisan optimize:clear` lalu `php artisan optimize`. |
 
 ---
 
